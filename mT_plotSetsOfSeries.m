@@ -107,105 +107,10 @@ for iPltRow = 1 : size(PlotData, 1)
         subplotObj.LineWidth = axisLineWidth;
         subplotObj.FontSize = fontSize;
         
+        setupSubplotAxes(PlotStyle, iPltRow, iPltCol, fontSize)
+        
         % Loop through all the series to be plotted
         for iSeries = 1 : length(PlotData(iPltRow, iPltCol).Yvals)
-            
-            if isfield(PlotStyle, 'Yaxis') ...
-                    && isfield(PlotStyle.Yaxis(iPltRow), 'Ticks')
-
-                ylim(PlotStyle.Yaxis(iPltRow).Ticks([1, end]))
-                yticks(PlotStyle.Yaxis(iPltRow).Ticks)                
-            end
-                
-            if isfield(PlotStyle, 'Yaxis') ...
-                    && isfield(PlotStyle.Yaxis(iPltRow), 'TickLabels')
-                
-                yticklabels(PlotStyle.Yaxis(iPltRow).TickLabels) 
-            end
-            
-            if isfield(PlotStyle, 'Yaxis') ...
-                    && isfield(PlotStyle.Yaxis(iPltRow), 'InvisibleTickLablels')
-                
-                if ~isfield(PlotStyle.Yaxis(iPltRow), 'Ticks')
-                    error(['Must specify ticks if want to specify invisible ', ...
-                        'ticks. Otherwise get nasty effects as invisible ticks ', ...
-                        'functionality works by changing and *freezing* tick ', ...
-                        'labels.'])
-                end
-                
-                ax = gca;
-                labels = string(ax.YTickLabel);
-                labels(PlotStyle.Yaxis(iPltRow).InvisibleTickLablels) = ' ';
-                ax.YTickLabel = labels;
-            end
-            
-            if isfield(PlotStyle, 'Yaxis') ...
-                    && isfield(PlotStyle.Yaxis(iPltRow), 'Lims') ...
-                    && ~isempty(PlotStyle.Yaxis(iPltRow).Lims)
-                
-                ylim(PlotStyle.Yaxis(iPltRow).Lims)
-            end
-
-            if isfield(PlotStyle, 'Xaxis') ...
-                    && isfield(PlotStyle.Xaxis(iPltCol), 'Ticks')
-                
-                xlim(PlotStyle.Xaxis(iPltCol).Ticks([1, end]))
-                xticks(PlotStyle.Xaxis(iPltCol).Ticks)
-            end 
-                
-            if isfield(PlotStyle, 'Xaxis') ...
-                    && isfield(PlotStyle.Xaxis(iPltCol), 'TickLabels')
-                
-                xticklabels(PlotStyle.Xaxis(iPltCol).TickLabels)
-            end
-            
-            if isfield(PlotStyle, 'Xaxis') ...
-                    && isfield(PlotStyle.Xaxis(iPltCol), 'InvisibleTickLablels')
-                
-                if ~isfield(PlotStyle.Xaxis(iPltCol), 'Ticks')
-                    error(['Must specify ticks if want to specify invisible ', ...
-                        'ticks. Otherwise get nasty effects as invisible ticks ', ...
-                        'functionality works by changing and *freezing* tick ', ...
-                        'labels.'])
-                end
-                
-                ax = gca;
-                labels = string(ax.XTickLabel);
-                labels(PlotStyle.Xaxis(iPltCol).InvisibleTickLablels) = ' ';
-                ax.XTickLabel = labels;
-            end
-            
-            if isfield(PlotStyle, 'Xaxis') ...
-                    && isfield(PlotStyle.Xaxis(iPltCol), 'Lims') ...
-                    && ~isempty(PlotStyle.Xaxis(iPltCol).Lims)
-                
-                xlim(PlotStyle.Xaxis(iPltCol).Lims)
-            end
-            
-            % Whether we want to add labels depends on whether we are at the
-            % edge of the figure
-            if isfield(PlotStyle, 'Xaxis') ...
-                    && isfield(PlotStyle.Xaxis(iPltCol), 'Title')
-                
-                xLabel = PlotStyle.Xaxis(iPltCol).Title;
-            else
-                xLabel = [];
-            end
-
-            if isfield(PlotStyle, 'Yaxis') ...
-                    && isfield(PlotStyle.Yaxis(iPltRow), 'Title')
-                
-                yLabel = PlotStyle.Yaxis(iPltRow).Title;                
-            else
-                yLabel = [];
-            end
-            
-            if iPltCol == 1
-                ylabel(yLabel, 'FontSize',fontSize)
-            end
-            if iPltRow == size(PlotData, 1)
-                xlabel(xLabel, 'FontSize',fontSize)
-            end
             
             % What colour should we plot in?
             if isfield(PlotStyle.Data, 'Colour') ...
@@ -215,7 +120,7 @@ for iPltRow = 1 : size(PlotData, 1)
     
             % Otherwise use default colours
             else
-                plottingColour = mT_pickColour(iColour);
+                plottingColour = mT_pickColour(iSeries);
                 
                 % Store for legend
                 PlotStyle.Data(iSeries).Colour = plottingColour;
@@ -428,4 +333,109 @@ if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
 
 end
 
+
+end
+
+
+function setupSubplotAxes(PlotStyle, iPltRow, iPltCol, fontSize)
+% Sets up the axes for the active subplot, using the requested settings.
+
+if isfield(PlotStyle, 'Yaxis') ...
+        && isfield(PlotStyle.Yaxis(iPltRow), 'Ticks')
+    
+    ylim(PlotStyle.Yaxis(iPltRow).Ticks([1, end]))
+    yticks(PlotStyle.Yaxis(iPltRow).Ticks)
+end
+
+if isfield(PlotStyle, 'Yaxis') ...
+        && isfield(PlotStyle.Yaxis(iPltRow), 'TickLabels')
+    
+    yticklabels(PlotStyle.Yaxis(iPltRow).TickLabels)
+end
+
+if isfield(PlotStyle, 'Yaxis') ...
+        && isfield(PlotStyle.Yaxis(iPltRow), 'InvisibleTickLablels')
+    
+    if ~isfield(PlotStyle.Yaxis(iPltRow), 'Ticks')
+        error(['Must specify ticks if want to specify invisible ', ...
+            'ticks. Otherwise get nasty effects as invisible ticks ', ...
+            'functionality works by changing and *freezing* tick ', ...
+            'labels.'])
+    end
+    
+    ax = gca;
+    labels = string(ax.YTickLabel);
+    labels(PlotStyle.Yaxis(iPltRow).InvisibleTickLablels) = ' ';
+    ax.YTickLabel = labels;
+end
+
+if isfield(PlotStyle, 'Yaxis') ...
+        && isfield(PlotStyle.Yaxis(iPltRow), 'Lims') ...
+        && ~isempty(PlotStyle.Yaxis(iPltRow).Lims)
+    
+    ylim(PlotStyle.Yaxis(iPltRow).Lims)
+end
+
+if isfield(PlotStyle, 'Xaxis') ...
+        && isfield(PlotStyle.Xaxis(iPltCol), 'Ticks')
+    
+    xlim(PlotStyle.Xaxis(iPltCol).Ticks([1, end]))
+    xticks(PlotStyle.Xaxis(iPltCol).Ticks)
+end
+
+if isfield(PlotStyle, 'Xaxis') ...
+        && isfield(PlotStyle.Xaxis(iPltCol), 'TickLabels')
+    
+    xticklabels(PlotStyle.Xaxis(iPltCol).TickLabels)
+end
+
+if isfield(PlotStyle, 'Xaxis') ...
+        && isfield(PlotStyle.Xaxis(iPltCol), 'InvisibleTickLablels')
+    
+    if ~isfield(PlotStyle.Xaxis(iPltCol), 'Ticks')
+        error(['Must specify ticks if want to specify invisible ', ...
+            'ticks. Otherwise get nasty effects as invisible ticks ', ...
+            'functionality works by changing and *freezing* tick ', ...
+            'labels.'])
+    end
+    
+    ax = gca;
+    labels = string(ax.XTickLabel);
+    labels(PlotStyle.Xaxis(iPltCol).InvisibleTickLablels) = ' ';
+    ax.XTickLabel = labels;
+end
+
+if isfield(PlotStyle, 'Xaxis') ...
+        && isfield(PlotStyle.Xaxis(iPltCol), 'Lims') ...
+        && ~isempty(PlotStyle.Xaxis(iPltCol).Lims)
+    
+    xlim(PlotStyle.Xaxis(iPltCol).Lims)
+end
+
+% Whether we want to add labels depends on whether we are at the
+% edge of the figure
+if isfield(PlotStyle, 'Xaxis') ...
+        && isfield(PlotStyle.Xaxis(iPltCol), 'Title')
+    
+    xLabel = PlotStyle.Xaxis(iPltCol).Title;
+else
+    xLabel = [];
+end
+
+if isfield(PlotStyle, 'Yaxis') ...
+        && isfield(PlotStyle.Yaxis(iPltRow), 'Title')
+    
+    yLabel = PlotStyle.Yaxis(iPltRow).Title;
+else
+    yLabel = [];
+end
+
+if iPltCol == 1
+    ylabel(yLabel, 'FontSize',fontSize)
+end
+if iPltRow == size(PlotData, 1)
+    xlabel(xLabel, 'FontSize',fontSize)
+end
+
+end
 
