@@ -107,7 +107,7 @@ for iPltRow = 1 : size(PlotData, 1)
         subplotObj.LineWidth = axisLineWidth;
         subplotObj.FontSize = fontSize;
         
-        setupSubplotAxes(PlotStyle, iPltRow, iPltCol, fontSize)
+        setupSubplotAxes(PlotStyle, PlotData, iPltRow, iPltCol, fontSize)
         
         % Loop through all the series to be plotted
         for iSeries = 1 : length(PlotData(iPltRow, iPltCol).Yvals)
@@ -337,7 +337,7 @@ end
 end
 
 
-function setupSubplotAxes(PlotStyle, iPltRow, iPltCol, fontSize)
+function setupSubplotAxes(PlotStyle, PlotData, iPltRow, iPltCol, fontSize)
 % Sets up the axes for the active subplot, using the requested settings.
 
 if isfield(PlotStyle, 'Yaxis') ...
