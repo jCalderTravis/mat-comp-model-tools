@@ -89,14 +89,14 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 % 'median' error bars still reflect SEM, which doesn't really make sense.
 
 
-if ~isempty(varargin)
+if (~isempty(varargin)) && (~isempty(varargin{1}))
     figHandle = varargin{1};
     hold on
 else
     figHandle = figure;
 end
 
-if length(varargin)>=2
+if (length(varargin)>=2) && (~isempty(varargin{2}))
     averaging = varargin{2};
 else
     averaging = 'mean';
