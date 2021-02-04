@@ -53,10 +53,13 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %         viewing on a PC, or having in a paper... Options: 'computer', 'paper'
 %   Xaxis [size(PlotData, 2)] struct array with fields...
 %       Title       optional
-%       Ticks       optional
-%       TickLabels   optional
+%       Ticks       optional. First and last will be used as the limits of
+%                   for the plot, unless Xaxis.Lims is set.
+%       TickLabels  optional.
 %       InvisibleTickLablels optional. Vector which gives indecies of
-%       TickLabels. For the labels and ticks corresponding to these indicies,
+%                   TickLabels. For the labels and ticks corresponding to 
+%                   these indicies, ticks will be shown at these locations, 
+%                   no labels.
 %       ticks will be shown at these locations, no labels.
 %       Lims        optional. Two element vector used to set the limits of the
 %                   axis.
@@ -201,6 +204,10 @@ for iPtpnt = 1 : length(DSet.P)
                     % Compute the y-position
                     PtpntPlotData(iY, iX).BinY(iS, iBin, iPtpnt) ...
                         = YVars(iY).ProduceVar(DSet.P(iPtpnt).Data, binTrials);
+                    
+                    if isnan(PtpntPlotData(iY, iX).BinY(iS, iBin, iPtpnt))
+                        disp('here')
+                    end
                 end
             end
         end

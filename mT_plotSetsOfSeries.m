@@ -21,11 +21,13 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %         viewing on a PC, or having in a paper... Options: 'computer', 'paper'
 %   Xaxis [size(PlotData, 2)] struct array with fields...
 %       Title       optional
-%       Ticks       optional
-%       TickLabels   optional
+%       Ticks       optional. First and last will be used as the limits of
+%                   for the plot, unless Xaxis.Lims is set.
+%       TickLabels  optional.
 %       InvisibleTickLablels optional. Vector which gives indecies of
-%       TickLabels. For the labels and ticks corresponding to these indicies,
-%       ticks will be shown at these locations, no labels.
+%                   TickLabels. For the labels and ticks corresponding to 
+%                   these indicies, ticks will be shown at these locations, 
+%                   no labels.
 %       Lims        optional. Two element vector used to set the limits of the
 %                   axis.
 %   Yaxis [size(PlotData, 1)] struct array, with fields...
