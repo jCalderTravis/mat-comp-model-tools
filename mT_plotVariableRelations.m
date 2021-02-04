@@ -206,7 +206,7 @@ for iPtpnt = 1 : length(DSet.P)
                         = YVars(iY).ProduceVar(DSet.P(iPtpnt).Data, binTrials);
                     
                     if isnan(PtpntPlotData(iY, iX).BinY(iS, iBin, iPtpnt))
-                        disp('here')
+                        error('Plot value is nan.')
                     end
                 end
             end
