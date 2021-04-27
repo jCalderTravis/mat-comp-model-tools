@@ -54,12 +54,14 @@ numJobs = sum(~isnan(JobContainer.JobSubID));
 
 if ~resuming
     AllResults = cell(numJobs, 1);
+    AllLogs = cell(numJobs, 1);
     completedJobs = zeros(numJobs, 1);
     jobDuration = nan(numJobs, 1);
 
 	disp('**** New jobs ****')
 else
     AllResults = LoadedVars.AllResults;
+    AllLogs = LoadedVars.AllLogs;
     completedJobs = LoadedVars.completedJobs;
     jobDuration = LoadedVars.jobDuration;
 
@@ -93,6 +95,7 @@ dsetSpec = JobContainer.DSetSpec;
 settings = JobContainer.Settings;
 setupValFuns = JobContainer.SetupValFuns;
 saveFile = cell(numJobs, 1);
+logsSaveFile = cell(numJobs, 1);
 
 timeNow = findTimeInSecs;
 disp(['System     Collected info      ' ...
@@ -110,6 +113,8 @@ end
 for iJob = 1 : numJobs
     saveFile{iJob} = [jobFile(1 : end-trim), ...
         num2str(JobContainer.JobSubID(iJob)) '_result'];
+    logsSaveFile{iJob} = [jobFile(1 : end-trim), ...
+        num2str(JobContainer.JobSubID(iJob)) '___logs'];
     ptpntData{iJob} = strcat(jobDirString, '/', ptpntData{iJob});
 end
 
@@ -137,7 +142,7 @@ for iJob = 1 : numJobs
         % There is no time to do anything
         disp('Skipping jobs due to time.')
     else
-        [AllResults{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
+        [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
             mainEval(funNames{iJob}, ...
             ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
             startTime, iJob);
@@ -153,9 +158,12 @@ disp(['System     Begin save          ' ...
 
 if sum(~completedJobs) == 0
     save(strcat(saveFile{1}, '_PACKED'), 'AllResults', 'saveFile')
+    save(strcat(logsSaveFile{1}, '_PACKED'), 'AllLogs', 'saveFile')
     disp('All jobs completed')
 else
     save(strcat(saveFile{1}, '_PARTIAL'), 'AllResults', 'JobContainer', ...
+        'completedJobs', 'jobDuration')
+    save(strcat(logsSaveFile{1}, '_PARTIAL'), 'AllLogs', 'JobContainer', ...
         'completedJobs', 'jobDuration')
     disp(['Saved after ' num2str(sum(completedJobs)) ' of ' ...
         num2str(length(completedJobs)) ' jobs completed.'])
@@ -204,7 +212,7 @@ startTime = (datetimeNow(3) *(24*60*60)) + ...
 
 end
 
-function [AllResults, completedJobs, jobDuration] = mainEval(funNames, ...
+function [AllResults, Logs, completedJobs, jobDuration] = mainEval(funNames, ...
     ptpntData, dsetSpec, settings, setupValFuns, startTime, iJob)
 
 timeNow = findTimeInSecs;
@@ -212,7 +220,7 @@ disp(['Job' num2str(iJob) '     Schedule         ' ...
     num2str((timeNow - startTime)/60) ' mins.'])
 jobStart = findTimeInSecs;
 
-AllResults = feval(funNames, ptpntData, ...
+[AllResults, Logs] = feval(funNames, ptpntData, ...
     dsetSpec, settings, setupValFuns, iJob);
 
 timeNow = findTimeInSecs;

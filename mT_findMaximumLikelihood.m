@@ -1,4 +1,4 @@
-function Result = mT_findMaximumLikelihood(PtpntData, DSetSpec, Settings, ...
+function [Result, Logs] = mT_findMaximumLikelihood(PtpntData, DSetSpec, Settings, ...
     SetupValFun, jobNum)
 % Find the maximum likelihood fit (at the participant level) for the the model
 % specified in settings.
@@ -21,6 +21,8 @@ function Result = mT_findMaximumLikelihood(PtpntData, DSetSpec, Settings, ...
 
 % OUTPUT
 % Result       Results of the fitting.
+% Logs         Structure detailing the various initial candedate parameter 
+%              values, and their associated negative log-liklihoods.
 
 funTimer = tic;
 
@@ -68,19 +70,13 @@ for iCand = 1 : Settings.NumStartCand
     negLL(iCand) = objectiveFun(CandVals.InitialVals);
 end
 
-if any(negLL) < 0; error('bug'); end
+if any(negLL < 0); error('bug'); end
 
 disp(['Job' num2str(jobNum) '     Starts eval''d    ' num2str(toc(funTimer)) ' secs.'])
 
 % Save the start candidates
-logsFolder = 'logs';
-if ~exist([pwd '/' logsFolder], 'dir')
-    mkdir([pwd '/' logsFolder])
-end
-
-logsFile = tempname([pwd '/' logsFolder]);
-save(logsFile, 'negLL', 'AllCandInitialVals')
-Result.LogsFile = logsFile;
+Logs.AllCandInitialVals = AllCandInitialVals;
+Logs.NegLL = negLL;
 
 [~, bestCand] = min(negLL);
 SetupValsRaw = AllCandValsUnpacked{bestCand};
