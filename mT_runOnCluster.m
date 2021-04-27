@@ -158,13 +158,12 @@ disp(['System     Begin save          ' ...
 
 if sum(~completedJobs) == 0
     save(strcat(saveFile{1}, '_PACKED'), 'AllResults', 'saveFile')
-    save(strcat(logsSaveFile{1}, '_PACKED'), 'AllLogs', 'saveFile')
+    save(strcat(logsSaveFile{1}, '_PACKED'), 'AllLogs')
     disp('All jobs completed')
 else
     save(strcat(saveFile{1}, '_PARTIAL'), 'AllResults', 'JobContainer', ...
         'completedJobs', 'jobDuration')
-    save(strcat(logsSaveFile{1}, '_PARTIAL'), 'AllLogs', 'JobContainer', ...
-        'completedJobs', 'jobDuration')
+    save(strcat(logsSaveFile{1}, '_PARTIAL'), 'AllLogs')
     disp(['Saved after ' num2str(sum(completedJobs)) ' of ' ...
         num2str(length(completedJobs)) ' jobs completed.'])
 end
