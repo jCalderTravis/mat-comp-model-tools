@@ -60,24 +60,17 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %                   TickLabels. For the labels and ticks corresponding to 
 %                   these indicies, ticks will be shown at these locations, 
 %                   no labels.
-%       ticks will be shown at these locations, no labels.
 %       Lims        optional. Two element vector used to set the limits of the
 %                   axis.
 %   Yaxis [size(PlotData, 1)] struct array with fields...
-%       Title       optional
-%       Ticks       optional
-%       TickLabels   optional
-%       InvisibleTickLablels optional. Vector which gives indecies of
-%       TickLabels. For the labels and ticks corresponding to these indicies,
-%       ticks will be shown at these locations, no labels.
-%       Lims        optional. Two element vector used to set the limits of the
-%                   axis.
+%       Same fields as Xaxis, and...
 %       RefVal      optional. Plots a reference line at specified y-val.
 %                   For no line set to NaN.
 %   Data [num series] long strcut array with fields...
 %       Name        Name of the series (for legend, optional)
-%       PlotType    'scatter', 'scatterOnly', 'line', or 'errorShading' (shades the area
-%                   in between the error bars.
+%       PlotType    'scatter' (scattered error bars), 'scatterOnly' (just 
+%                   scattered dots), 'line', or 'errorShading' (shades the 
+%                   area in between the error bars)
 %       Colour      optional  
 %       MakerType   optional (only used for scatter PlotType)  
 %   Legend  Struct array with fields...

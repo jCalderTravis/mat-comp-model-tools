@@ -1,9 +1,9 @@
 function mT_plotParameterFits(DSet, modelNumber, plotType, sepPlots, smallFont)
 % Plots the distribution accross participants of all parameters in modelNumber
 % model. Only the best fit attained for each participant is used. If the data
-% were simulated and a true value for the parameter exists a reference line is
-% added. See the README for how to pass this information, under 
-% 'DSet.P(i).Sim'.
+% were simulated and a true value for the parameter exists, this information
+% can be included in the plot. See the README for how to pass this 
+% information, under 'DSet.P(i).Sim'.
 
 % INPUT
 % plotType: 'hist', histogram of fitted params around a reference line which is the 
