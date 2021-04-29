@@ -1,5 +1,5 @@
 function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
-    figureTitle, individualVals)
+    figureTitle, individualVals, varargin)
 % Makes plots of the agregate AIC, BIC, and/or predDecity, along with the number of
 % participants best fit by each model. 
 
@@ -12,11 +12,19 @@ function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
 % individualVals        If true then on top of the bar plot of mean AIC/BIC,
 %                       also plots the participant by participant values as line
 %                       plots.
+% varargin{1}           numModels long cell array of model names to use 
+%                       instead of simply numebering the models
 
 % OUTPUT
 % CritMeans             Stucture with field for AIC and BIC containing vector of
 %                       information criterion means, one for each model
 % figH                  Figure handle
+
+if ~isempty(varargin)
+    modelNames = varargin{1};
+else
+    modelNames = [];
+end
 
 assert(~isempty(individualVals))
 if any(predDencity(:)<0); error('Pass the **negative** cross validated LL.'); end
@@ -105,6 +113,15 @@ for iCrit = 1 : length(infoCrit)
     
     xlim([0.1, length(CritResultsTable{:, 1}) + 0.9])
     
+    % Replace model numbers with names
+    if ~isempty(modelNames)
+        if length(xticklabels()) ~= length(modelNames)
+            error('Number of labels does not match the number of ticks')
+        end
+        xticklabels(modelNames)
+        xtickangle(90)
+    end
+    
     
     % Plot type B: num participants best described
     subPlotObj = subplot(critCounter-1, 2, 2 + ((iCrit -1) *2) );
@@ -136,6 +153,15 @@ for iCrit = 1 : length(infoCrit)
     
     set(gca, 'TickDir', tickDirection);
     xlim([0.1, length(CritResultsTable{:, 1}) + 0.9])
+    
+    % Replace model numbers with names
+    if ~isempty(modelNames)
+        if length(xticklabels()) ~= length(modelNames)
+            error('Number of labels does not match the numebr of ticks')
+        end
+        xticklabels(modelNames)
+        xtickangle(90)
+    end
     
 end
     
