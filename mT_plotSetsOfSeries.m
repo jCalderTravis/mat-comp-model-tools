@@ -36,8 +36,9 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %                   For no line set to NaN.
 %   Data [num series] long strcut array with fields...
 %       Name        Name of the series (for legend, optional)
-%       PlotType    'scatter', 'scatterOnly', 'line', or 'errorShading' 
-%                   (shades the area in between the error bars.
+%       PlotType    'scatter' (scattered error bars), 'scatterOnly' (just 
+%                   scattered dots), 'line', or 'errorShading' 
+%                   (shades the area in between the error bars)
 %       Colour      optional  
 %       MakerType   optional (only used for scatter PlotType)
 %   Legend  Struct array with fields...
