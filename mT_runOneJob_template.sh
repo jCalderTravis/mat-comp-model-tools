@@ -31,6 +31,4 @@ module load matlab/2018b
 
 matlab -nodisplay -nosplash -r "mT_runOnCluster($in1, $in2, $SBATCH_TIMELIMIT, $in3)"
 
-# Delete temp folder
-rm -rf $MATLAB_PREFDIR
 
