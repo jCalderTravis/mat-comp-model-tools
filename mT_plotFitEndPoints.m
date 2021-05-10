@@ -9,15 +9,24 @@ function [numSuccess, restartsFigure, numSuccessFig] = mT_plotFitEndPoints(DSet,
 % individualPlots: If true, a plot for each participant is produced with more
 % detail
 % tol: How many LLs away from the best fit will we count as sucesses?
-% varargin: A participant number if just want to plot one participant, or row
+% varargin{1}: A participant number if just want to plot one participant, or row
 % vector of particpant numbers.
+% varargin{2}: numModels long cell array of model names to use instead of 
+% simply numebering the models
 
-if isempty(varargin)
-    toPlot = 1 : length(DSet.P);
-    plotAll = true;
-else
+if (~isempty(varargin)) && (~isempty(varargin{1}))
     toPlot = varargin{1};
     plotAll = false;
+    disp('Not plotting data from all participant, as requested.')
+else
+    toPlot = 1 : length(DSet.P);
+    plotAll = true;
+end
+
+if (length(varargin)>1) && (~isempty(varargin{2}))
+    modelNames = varargin{2};
+else
+    modelNames = [];
 end
 
 % Check same models have been applied to all participants and in same order
@@ -98,6 +107,12 @@ restartsRequired(restartsRequired == Inf) = nan;
 h = heatmap(restartsRequired, 'CellLabelColor', 'none');
 h.GridVisible = 'off';
 h.XLabel = 'Model';
+if ~isempty(modelNames)
+    if length(h.XData) ~= length(modelNames)
+        error('Number of labels does not match the number of ticks')
+    end
+    h.XDisplayLabels = modelNames;
+end
 if plotAll
     h.YLabel = 'Participant';
 else

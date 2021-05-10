@@ -1,5 +1,6 @@
 function [AllDSets, FigureHandles] = mT_analyseClusterResults(directory, ...
-    paramPlotsModel, removeStartCand, allowMissingData, alreadyUnpacked)
+    paramPlotsModel, removeStartCand, allowMissingData, alreadyUnpacked, ...
+    varargin)
 % Run the main analysis for some cluster results
 
 % INPUT
@@ -12,11 +13,29 @@ function [AllDSets, FigureHandles] = mT_analyseClusterResults(directory, ...
 % error is raised.
 % alreadyUnpacked: boolean. Have the results from the cluster aleady been 
 % upacked. If true, skips the upacking of the results files.
+% varargin{1}: numModels long cell array of model names to use instead of 
+% simply numebering the models (only used for some plots)
+% varargin{2}: boolean. Set to true if running a model recovery. Additional
+% plots will be produced. Default is false.
 
 % OUTPUT
 % AllDSets: cell array. Each element is one of the datasets that was found, with
 % the results of the fitting on the cluster attached.
 % FigureHandles: Structure containing figure handles for key figures
+
+% Process input
+if (~isempty(varargin)) && (~isempty(varargin{1}))
+    modelNames = varargin{1};
+else
+    modelNames = [];
+end
+
+if (length(varargin)>1) && (~isempty(varargin{2}))
+    isModelRecov = varargin{2};
+else
+    isModelRecov = false;
+end
+
 
 DataSets = dir([directory, '\_*_DataStruct.mat']);
 if isempty(DataSets)
@@ -44,8 +63,20 @@ for iD = 1 : length(DataSets)
     AllDSets{iD} = DSet;
 end
 
-FigureHandles = mT_compareInfoCritAcrossDatasets(AllDSets);
+if isModelRecov
+    FigureHandles = mT_compareInfoCritAcrossDatasets(AllDSets, modelNames);
+else
+    FigureHandles = [];
+end
 
+% If there is only a single dataset, plot the AIC and BIC results for this
+% dataset
+if length(AllDSets) == 1
+    DSet = AllDSets{1};
+    [aicData, bicData] = mT_collectBicAndAicInfo(DSet);
+    [~, thisFig] = mT_plotAicAndBic(aicData, bicData, [], '', false);
+    FigureHandles.AicBic = thisFig;
+end
 
 
 

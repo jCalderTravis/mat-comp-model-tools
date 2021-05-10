@@ -8,6 +8,10 @@ function paramMedian = mT_produceParamStats(DSet, dir, varargin)
 % varargin 2: Text to use for the labeling the parameters. Structure with a
 % field for every paramter want to relable. Field contains text.
 % varargin 3: Text to add to the file name when saving
+% varargin 4: numModels long cell array of model names to use instead of 
+% simply numebering the models. Needs to be as long as the number of models
+% that have fit results in DSet, not just as long as the number of model 
+% for which paramter values have been requested.
 
 % NOTE
 % For use in latex, need to have the package siunitx
@@ -32,6 +36,18 @@ else
     fileNameEnd = '';
 end
 
+if length(varargin)>=4 && ~isempty(varargin{4})
+    modelNames = varargin{4};
+    if length(modelNames) ~= length(models)
+        error(['modelNames needs to be as long as the number of models ', ...
+                'that have fit results in DSet, not just as long as the ', ...
+                'number of model for which paramter values have been ', ...
+                'requested.'])
+    end
+else
+    modelNames = [];
+end
+
 % Open a file to write results to, and add titles
 if ~strcmp(dir, 'none')
     saveFile = fopen([dir '/paramStats' fileNameEnd '.tex'], 'w' );
@@ -44,7 +60,13 @@ if ~strcmp(dir, 'none')
     fprintf(saveFile, '%s\n', '\toprule');
 end 
 
-for iModel = modelsToAnlyse 
+for iModel = modelsToAnlyse
+    if ~isempty(modelNames)
+        thisModelName = modelNames{iModel};
+    else
+        thisModelName = num2str(iModel);
+    end
+    
     % Find the parameters in this model
     params = fieldnames(DSet.P(1).Models(iModel).BestFit.Params);
     
@@ -82,8 +104,8 @@ for iModel = modelsToAnlyse
                     midline = '\\midrule';
                 end
                 
-                modelText = [midline ' \n \\multirow{%d}{*}{%d} &'];
-                modelArgs = {sum(subParamTot), iModel};
+                modelText = [midline ' \n \\multirow{%d}{*}{%s} &'];
+                modelArgs = {sum(subParamTot), thisModelName};
             else
                 modelText = ' &';
                 modelArgs = {};
