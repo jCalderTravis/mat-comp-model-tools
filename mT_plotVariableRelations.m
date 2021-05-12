@@ -45,7 +45,8 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %                   Function handle. Function accepts 'DSet.P(i).Data' and 
 %                   produces a [num trials] long logical of trials to include
 %                   when evaluating this series. Note that trials are only
-%                   included if they meet all inclusion criteria, see 'YVars'.
+%                   included if they meet all inclusion criteria, see 
+%                   'XVars' and 'YVars'.
 %
 % PlotStyle struct array with fields...
 %   General
