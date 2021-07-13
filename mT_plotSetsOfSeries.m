@@ -37,7 +37,7 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %   Data [num series] long strcut array with fields...
 %       Name        Name of the series (for legend, optional)
 %       PlotType    'scatter' (scattered error bars), 'scatterOnly' (just 
-%                   scattered dots), 'line', or 'errorShading' 
+%                   scattered dots), 'line', 'thickLine', or 'errorShading' 
 %                   (shades the area in between the error bars)
 %       Colour      optional  
 %       MakerType   optional (only used for scatter PlotType)
@@ -190,15 +190,22 @@ for iPltRow = 1 : size(PlotData, 1)
                         'LineWidth', plotLineWidth);
                     erObj.CapSize = erObj.CapSize*(2/3);
                     
-                elseif strcmp(PlotStyle.Data(iSeries).PlotType, 'line')
-                % Fading will determine half of the line/shading to
-                % the right and half of the line/shading to the left of the
-                % Xval, for line plots.    
-                
+                elseif any(strcmp(PlotStyle.Data(iSeries).PlotType, ...
+                        {'line', 'thickLine'}))
+                    % Fading will determine half of the line/shading to
+                    % the right and half of the line/shading to the left of the
+                    % Xval, for line plots.                 
                     currentX = ...
                         PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals(iXpos);
                     currentY = ...
                         PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals(iXpos);
+                    
+                    if strcmp(PlotStyle.Data(iSeries).PlotType, ...
+                            'thickLine')
+                        thisWidth = plotLineWidth * 2;
+                    else
+                        thisWidth = plotLineWidth;
+                    end
 
                     % Start with the lines to the right of the point. There
                     % is nothing to draw to the right if this is the final
@@ -214,7 +221,7 @@ for iPltRow = 1 : size(PlotData, 1)
                         plot([currentX, (currentX + nextX)/2], ...
                             [currentY, (currentY + nextY)/2], ...
                             'Color', colourIncFade, ...
-                            'LineWidth', plotLineWidth);
+                            'LineWidth', thisWidth);
                     end
 
                     % Now the lines to the left of the point. There
@@ -231,7 +238,7 @@ for iPltRow = 1 : size(PlotData, 1)
                         plot([(prevX + currentX)/2, currentX], ...
                             [(prevY + currentY)/2, currentY], ...
                             'Color', colourIncFade, ...
-                            'LineWidth', plotLineWidth);
+                            'LineWidth', thisWidth);
                     end
                     
                 elseif strcmp(PlotStyle.Data(iSeries).PlotType, ...
