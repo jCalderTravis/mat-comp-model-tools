@@ -2,7 +2,7 @@
 
 This repository contains a set of tools written in Matlab that are helpful for computational model fitting, and plotting. An [older version](https://github.com/jCalderTravis/mat-comp-model-tools/releases/tag/v1.0) of this code was used for the analysis in the paper [_Explaining the effects of distractor statistics in visual search_](https://doi.org/10.1101/2020.01.03.893057).
 
-Contact: Joshua Calder-Travis, j.calder.travis@gmail.com
+Author: Joshua Calder-Travis, j.calder.travis@gmail.com
 
 _Those sections of the code used in associated papers and preprints have been carefully checked. Nevertheless, no guarantee or warranty is provided for any part of the code._
 
