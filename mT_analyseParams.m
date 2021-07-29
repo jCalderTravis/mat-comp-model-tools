@@ -8,7 +8,7 @@ function resultsTable = mT_analyseParams(paramData, paramNames, varargin)
 % varargin: If want one-tailed t-tests provide 'left' or 'right'
 
 % TESTING
-% If pass infoCrit as the string 'test', runs tests instead.
+% If pass paramData as the string 'test', runs tests instead.
 
 if strcmp(paramData, 'test')
     testFun()
