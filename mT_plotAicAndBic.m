@@ -22,8 +22,10 @@ function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
 
 if ~isempty(varargin)
     modelNames = varargin{1};
+    xlabelTxt = 'Model';
 else
     modelNames = [];
+    xlabelTxt = 'Model number';
 end
 
 assert(~isempty(individualVals))
@@ -75,7 +77,7 @@ for iCrit = 1 : length(infoCrit)
     
     xticks(CritResultsTable.modelNums)
     ylabel({['Mean ' nameForPlot{iCrit}], '(difference from best model)'})
-    xlabel('Model number')
+    xlabel(xlabelTxt)
     
     hold on
     
@@ -135,7 +137,7 @@ for iCrit = 1 : length(infoCrit)
         ylabel('Number best fitting participants')
     end
     
-    xlabel('Model number')
+    xlabel(xlabelTxt)
     xticks(CritResultsTable.modelNums)
     
     hold on
