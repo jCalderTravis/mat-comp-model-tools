@@ -155,7 +155,7 @@ Packed1 = mT_packUnpackParams('pack', Settings, Unpacked1);
 Unpacked2 = mT_packUnpackParams('unpack', Settings, Packed1);
 Packed2 = mT_packUnpackParams('pack', Settings, Unpacked2);
 
-assert(isequal(Unpacked1, Unpacked2))
+mT_assertStructsAreClose(Unpacked1, Unpacked2)
 assert(isequal(Packed1, Packed2))
 
 end
