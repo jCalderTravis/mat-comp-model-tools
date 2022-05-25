@@ -44,11 +44,10 @@ end
 
 disp(['Job' num2str(jobNum) '     Vars loaded      '   num2str(toc(funTimer)) ' secs.'])
 
-if isfield(Settings, 'ReseedRng') && Settings.ReseedRng
-    rng('shuffle')
-    Result.RngSettings = rng;
-else
-    warning('Not reseeding the random number generator.')
+Result.RngSettings = rng;
+if isfield(Settings, 'ReseedRng') && (~Settings.ReseedRng)
+    error('Option to not reseed the random generator has been removed')
+    % Reseeding takes place in mT_runOnCluster
 end
 
 
@@ -110,6 +109,13 @@ end
 
 % Print some info
 disp('****** Info on fit')
+disp('Unpacked lower bound: ')
+disp(SetupValsRaw.LowerBound)
+disp('Unpacked initial vals: ')
+disp(SetupValsRaw.InitialVals)
+disp('Unpacked upper bound: ')
+disp(SetupValsRaw.UpperBound)
+
 disp(['Packed lower bound: ' num2str(SetupVals.LowerBound)])
 disp(['Packed initial vals: ' num2str(SetupVals.InitialVals)])
 disp(['Packed upper bound: ' num2str(SetupVals.UpperBound)])

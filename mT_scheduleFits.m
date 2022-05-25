@@ -1,8 +1,9 @@
 function DSet = mT_scheduleFits(mode, DSet, Settings, scheduleFolder)
 
 % INPUT
-% mode          'cluster', schedule for the cluster, or 'local' runs
-%               straight away
+% mode          str. 'cluster' schedules for the cluster without a parfor 
+%               loop, 'clusterPar' schedules for the cluster with a parfor
+%               loop used on the cluster, and 'local' runs immediately
 % DSet          Should follow the standard data format. See README.
 % Settings      Structure. See README. If Settings
 %               is an array of such structures, a fit is scheduled for each
@@ -19,12 +20,15 @@ function DSet = mT_scheduleFits(mode, DSet, Settings, scheduleFolder)
 jobsPerContainer = Settings.JobsPerContainer;
 
 for iSet = 1 : length(Settings)
-    if strcmp(mode, 'cluster') ...
-            && ((~isfield(Settings(iSet), 'ReseedRng') ...
-            || ~Settings(iSet).ReseedRng))
-        error(['Rng shuffle not selected by jobs sent to cluster. ', ...
-            'Cluster may use same random seed repeatedly.'])
+    if isfield(Settings(iSet), 'ReseedRng') && (~Settings(iSet).ReseedRng)
+        error('Option to not reseed the random generator has been removed')
+        % Reseeding takes place in mT_runOnCluster
     end
+end
+
+if strcmp(mode, 'local')
+    % Reseeding takes place in mT_runOnCluster when running on cluster
+    rng('shuffle')
 end
 
 % Work out where we will store the results of the modelling? This depends
@@ -41,7 +45,7 @@ end
 % Save participant data for later use if running on cluster
 PtpntDataSaveDir = cell(length(DSet.P), 1);
 
-if strcmp(mode, 'cluster')
+if strcmp(mode, {'cluster', 'clusterPar'})
     for iPtpnt = 1 : length(DSet.P)
         PtpntData = DSet.P(iPtpnt).Data;
         PtpntDataSaveDir{iPtpnt} = tempname(scheduleFolder);
@@ -54,16 +58,20 @@ if strcmp(mode, 'cluster')
         fileSize = saveFile.bytes;
         if ~(fileSize > 10000); error('Bug'); end
     end
+else
+    assert(strcmp(mode, 'local'))
 end
 
 
 % If we will be running on the cluster we need to store the requested
 % function runs for later execution.
-if strcmp(mode, 'cluster')
+if strcmp(mode, {'cluster', 'clusterPar'})
     funNum = 1;
     jobContainerCount = 1;
     JobContainer = generateJobContainer(jobsPerContainer, jobContainerCount, ...
-        scheduleFolder);
+        scheduleFolder, mode);
+else
+    assert(strcmp(mode, 'local'))
 end
 
 for iModel = 1 : length(Settings)
@@ -106,7 +114,7 @@ for iModel = 1 : length(Settings)
                     ~] = mT_findMaximumLikelihood(PtpntData, DSetSpec, ...
                     TheseSettings, SetupValsFun, '--');
                 
-            elseif strcmp(mode, 'cluster')
+            elseif strcmp(mode, {'cluster', 'clusterPar'})
                 
                 JobContainer.JobSubID(funNum) = funNum;
                 JobContainer.FunName{funNum} = 'mT_findMaximumLikelihood';
@@ -140,8 +148,11 @@ for iModel = 1 : length(Settings)
                     jobContainerCount = jobContainerCount +1;
                     JobContainer = generateJobContainer(jobsPerContainer, ...
                         jobContainerCount, ...
-                        scheduleFolder);
+                        scheduleFolder, ...
+                        mode);
                 end
+            else
+                error('Bug')
             end
         end
         disp('One participant, one model, complete')
@@ -149,7 +160,7 @@ for iModel = 1 : length(Settings)
 end
 
 % Save the final job container
-if strcmp(mode, 'cluster') && ~(funNum == 1)
+if strcmp(mode, {'cluster', 'clusterPar'}) && ~(funNum == 1)
     saveWithoutSomeHandles(JobContainer)
 end
 
@@ -162,7 +173,7 @@ end
 
 % If we are running in cluster mode save DSet, as this now contains job IDs
 % which link to the scheduled jobs.
-if strcmp(mode, 'cluster') 
+if strcmp(mode, {'cluster', 'clusterPar'})
     now = string(datetime);
     now = now{1};
     now([3, 7, 15, 18]) = [];
@@ -172,11 +183,11 @@ if strcmp(mode, 'cluster')
     save([scheduleFolder '/_' now '_DataStruct'], 'DSet', '-v7.3')
     diff = toc;
     
-    % If saving the files has been particularly quick, wait 1 second to ensure
+    % If saving the files has been particularly quick, wait 3 seconds to ensure
     % that if this function is called again immediately, no JobContainers will
     % be given the same name as an existing one (these are based on the time in
     % seconds).
-    if diff < 1; pause(1); end
+    if diff < 3; pause(3); end
     
 end
 
@@ -184,7 +195,7 @@ end
 
 
 function JobContainer = generateJobContainer(jobsPerContainer, ...
-    jobContainerCount, scheduleFolder)
+    jobContainerCount, scheduleFolder, mode)
 % Generate a strcuture to store requested jobs
 
 % Generate a job ID number 
@@ -193,8 +204,9 @@ now = now{1};
 now([3, 7, 15, 18]) = [];
 now(10)='_';
 
-jobContrainerID = [now '_' num2str(jobContainerCount)];
-JobContainer.ID = jobContrainerID;
+jobContainerID = [now '_' num2str(jobContainerCount)];
+JobContainer.Count = jobContainerCount;
+JobContainer.ID = jobContainerID;
 
 % Where will we save the job container later?
 JobContainer.SaveDir = [scheduleFolder '/' JobContainer.ID '_job.mat'];
@@ -204,8 +216,15 @@ if isfile(JobContainer.SaveDir)
     error('bug')
 end
 
-% Initialise
 JobContainer.JobSubID  = NaN(jobsPerContainer, 1);
+
+if strcmp(mode, 'cluster')
+    JobContainer.UseParfor = false;
+elseif strcmp(mode, 'clusterPar')
+    JobContainer.UseParfor = true;
+else
+    error('Bug')
+end
 
 end
 

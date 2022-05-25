@@ -149,7 +149,6 @@ Model fitting is performed using settings that are specified in a particular Mat
 - `SupressOutput`   If set to true, information of progress is suppressed. 
 - `DebugMode`       If set to true and fmincon is the algorithm, only a very small
                 number of search iterations are run in each fit. 
-- `ReseedRng`       If defined and true, reseeds the random number generator.
 - `JobsPerContainer`
                 Only used by mT_scheduleFits to decide how many jobs to
                 put in each container. This in turn determines how many

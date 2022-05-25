@@ -15,6 +15,8 @@ function mT_runOnCluster(jobDirectory, jobFile, resuming, timelimit, varargin)
 
 % Quit matlab if job fails
 try
+    
+addpath(genpath([jobDirectory '/scripts']))
 
 class(timelimit)
 disp(timelimit)
@@ -52,6 +54,13 @@ LoadedVars = load(jobFile);
 JobContainer = LoadedVars.JobContainer;
 numJobs = sum(~isnan(JobContainer.JobSubID));
 
+% Set random seed in such a way that it is unique for each job, and also
+% within a job, for each time that job is restarted
+rng('shuffle')
+randomSeed = randi(100000) + JobContainer.Count;
+rng(randomSeed)
+disp(['Random generator seed used: ' num2str(randomSeed)])
+
 if ~resuming
     AllResults = cell(numJobs, 1);
     AllLogs = cell(numJobs, 1);
@@ -81,13 +90,6 @@ if (timeNow - startTime)/60 > 1.2
 	exit
 end
             
-% Add path to scripts
-addpath(genpath([jobDirectory '/scripts']))
-
-timeNow = findTimeInSecs;
-disp(['System     Path added          ' ...
-                num2str((timeNow - startTime)/60) ' mins.'])
-
 % Collect required info
 funNames = JobContainer.FunName;
 ptpntData = JobContainer.PtpntData;
@@ -124,30 +126,47 @@ disp(['System     Schedule start      ' ...
             
             
 % Run the jobs.
-for iJob = 1 : numJobs
-    avJobDuration = nanmean(jobDuration);
-    if isnan(avJobDuration); avJobDuration = 0; end
+if ~JobContainer.UseParfor
+    disp('Not using parfor')
+    
+    for iJob = 1 : numJobs
+        avJobDuration = nanmean(jobDuration);
+        if isnan(avJobDuration); avJobDuration = 0; end
 
-    timeNow = findTimeInSecs;
-    elapsedTime = timeNow - startTime;
-    remainingTime = secsLimit - elapsedTime;
-    disp(['Time remaining: ' num2str(remainingTime)])
-    disp(['Average job duration: ' num2str(avJobDuration)])
+        timeNow = findTimeInSecs;
+        elapsedTime = timeNow - startTime;
+        remainingTime = secsLimit - elapsedTime;
+        disp(['Time remaining: ' num2str(remainingTime)])
+        disp(['Average job duration: ' num2str(avJobDuration)])
 
-    if completedJobs(iJob)
-        % Nothing to do
-    elseif avJobDuration > 100000
-        disp('********** Skipping due to slow jobs **********')
-    elseif (avJobDuration*2) > remainingTime
-        % There is no time to do anything
-        disp('Skipping jobs due to time.')
-    else
-        [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
-            mainEval(funNames{iJob}, ...
-            ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
-            startTime, iJob);
+        if completedJobs(iJob)
+            % Nothing to do
+        elseif avJobDuration > 100000
+            disp('********** Skipping due to slow jobs **********')
+        elseif (avJobDuration*2) > remainingTime
+            % There is no time to do anything
+            disp('Skipping jobs due to time.')
+        else
+            [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
+                mainEval(funNames{iJob}, ...
+                ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
+                startTime, iJob);
+        end
+
     end
-
+else
+    disp('Using parfor')
+    
+    parfor iJob = 1 : numJobs
+        if completedJobs(iJob)
+            % Nothing to do
+        else
+            [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
+                mainEval(funNames{iJob}, ...
+                ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
+                startTime, iJob);
+        end
+    end
 end
 
 % Save reuslts if all jobs have run. Name the container after the first result.
@@ -180,7 +199,6 @@ if ~inDebugMode
 else
     % Don't want these if keeping MATLAB open
     rmpath(genpath([jobDirectory '/scripts']))
-    rmpath([jobDirectory '/bads-master'])
 end
 
 catch erMsg
