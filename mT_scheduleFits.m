@@ -45,7 +45,7 @@ end
 % Save participant data for later use if running on cluster
 PtpntDataSaveDir = cell(length(DSet.P), 1);
 
-if strcmp(mode, {'cluster', 'clusterPar'})
+if any(strcmp(mode, {'cluster', 'clusterPar'}))
     for iPtpnt = 1 : length(DSet.P)
         PtpntData = DSet.P(iPtpnt).Data;
         PtpntDataSaveDir{iPtpnt} = tempname(scheduleFolder);
@@ -65,7 +65,7 @@ end
 
 % If we will be running on the cluster we need to store the requested
 % function runs for later execution.
-if strcmp(mode, {'cluster', 'clusterPar'})
+if any(strcmp(mode, {'cluster', 'clusterPar'}))
     funNum = 1;
     jobContainerCount = 1;
     JobContainer = generateJobContainer(jobsPerContainer, jobContainerCount, ...
@@ -114,7 +114,7 @@ for iModel = 1 : length(Settings)
                     ~] = mT_findMaximumLikelihood(PtpntData, DSetSpec, ...
                     TheseSettings, SetupValsFun, '--');
                 
-            elseif strcmp(mode, {'cluster', 'clusterPar'})
+            elseif any(strcmp(mode, {'cluster', 'clusterPar'}))
                 
                 JobContainer.JobSubID(funNum) = funNum;
                 JobContainer.FunName{funNum} = 'mT_findMaximumLikelihood';
@@ -160,7 +160,7 @@ for iModel = 1 : length(Settings)
 end
 
 % Save the final job container
-if strcmp(mode, {'cluster', 'clusterPar'}) && ~(funNum == 1)
+if any(strcmp(mode, {'cluster', 'clusterPar'})) && ~(funNum == 1)
     saveWithoutSomeHandles(JobContainer)
 end
 
@@ -173,7 +173,7 @@ end
 
 % If we are running in cluster mode save DSet, as this now contains job IDs
 % which link to the scheduled jobs.
-if strcmp(mode, {'cluster', 'clusterPar'})
+if any(strcmp(mode, {'cluster', 'clusterPar'}))
     now = string(datetime);
     now = now{1};
     now([3, 7, 15, 18]) = [];

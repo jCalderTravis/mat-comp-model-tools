@@ -13,13 +13,16 @@ function mT_runOnCluster(jobDirectory, jobFile, resuming, timelimit, varargin)
 % Specified in the format used by slurm.
 % varargin: If set to 'debug', MATLAB does not quit on error
 
+disp('Key input arguments...')
+disp(['jobDirectory: ' jobDirectory '; of type ' class(jobDirectory)])
+disp(['jobFile: ' jobFile '; of type ' class(jobFile)])
+disp(['resuming: ' resuming '; of type ' class(resuming)])
+disp(['timelimit: ' timelimit '; of type ' class(timelimit)])
+
 % Quit matlab if job fails
 try
     
 addpath(genpath([jobDirectory '/scripts']))
-
-class(timelimit)
-disp(timelimit)
 
 % Process resuming input
 disp(str2num(resuming))

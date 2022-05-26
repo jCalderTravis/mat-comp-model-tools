@@ -71,7 +71,7 @@ end
 
 % If there is only a single dataset, plot the AIC and BIC results for this
 % dataset
-if length(AllDSets) == 1
+if (length(AllDSets) == 1) && (length(AllDSets{1}.P(1).Models) > 1)
     DSet = AllDSets{1};
     [aicData, bicData] = mT_collectBicAndAicInfo(DSet);
     [~, thisFig] = mT_plotAicAndBic(aicData, bicData, [], '', false);
