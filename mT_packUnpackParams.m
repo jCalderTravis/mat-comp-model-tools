@@ -156,7 +156,21 @@ Unpacked2 = mT_packUnpackParams('unpack', Settings, Packed1);
 Packed2 = mT_packUnpackParams('pack', Settings, Unpacked2);
 
 mT_assertStructsAreClose(Unpacked1, Unpacked2)
-assert(isequal(Packed1, Packed2))
+
+Packed1 = round(Packed1, 17);
+Packed2 = round(Packed2, 17);
+
+if ~isequal(Packed1, Packed2)
+    disp('Error info: The following should be equal...')
+    disp(Packed1)
+    disp(Packed2)
+    for iEntry = 1 : length(Packed1)
+        disp(Packed1(iEntry))
+        disp(Packed2(iEntry))
+        disp(Packed2(iEntry) - Packed1(iEntry))
+    end
+    error('Bug')
+end
 
 end
 
