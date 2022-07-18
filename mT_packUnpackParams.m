@@ -157,8 +157,8 @@ Packed2 = mT_packUnpackParams('pack', Settings, Unpacked2);
 
 mT_assertStructsAreClose(Unpacked1, Unpacked2)
 
-Packed1 = round(Packed1, 17);
-Packed2 = round(Packed2, 17);
+Packed1 = round(Packed1, 15);
+Packed2 = round(Packed2, 15);
 
 if ~isequal(Packed1, Packed2)
     disp('Error info: The following should be equal...')
