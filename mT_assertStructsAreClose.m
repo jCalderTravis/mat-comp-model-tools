@@ -8,8 +8,17 @@ allFields = fieldnames(structA);
 for iF = 1 : length(allFields)
    thisField = allFields{iF};
    
-   assert(isequal(...
-       round(structA.(thisField), 7), ...
-       round(structB.(thisField), 7) ...
-       ))
+   try
+       assert(isequal(...
+           round(structA.(thisField), 6), ...
+           round(structB.(thisField), 6) ...
+           ))
+   catch err
+       disp('The following were expected to be approximately equal:')
+       disp(structA.(thisField))
+       disp(structB.(thisField))
+       disp('But there is a difference off:')
+       disp(structA.(thisField) - structB.(thisField))
+       rethrow(err)
+   end
 end
