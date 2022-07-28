@@ -88,7 +88,7 @@ disp(['System     Data loaded         ' ...
                 num2str((timeNow - startTime)/60) ' mins.'])
             
 % Are things going very slowly?
-if (timeNow - startTime)/60 > 1.2
+if (timeNow - startTime)/60 > 5
 	disp('Exiting -- too slow')
 	exit
 end
