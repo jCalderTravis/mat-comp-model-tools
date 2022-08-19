@@ -35,7 +35,8 @@ end
 % Process time limit info
 disp(['Submision time limit: ' timelimit])
 if length(timelimit) ~= 8; error('Unexpected time spec'); end 
-secsLimit = (60 * 60 * str2num(timelimit(1:2))) + (60 * str2num(timelimit(4:5))) ...
+secsLimit = (60 * 60 * str2num(timelimit(1:2))) ...
+    + (60 * str2num(timelimit(4:5))) ...
     + str2num(timelimit(7:8));
 disp(['... in seconds: ' num2str(secsLimit)])
 startTime = findTimeInSecs;
@@ -133,14 +134,8 @@ if ~JobContainer.UseParfor
     disp('Not using parfor')
     
     for iJob = 1 : numJobs
-        avJobDuration = nanmean(jobDuration);
-        if isnan(avJobDuration); avJobDuration = 0; end
-
-        timeNow = findTimeInSecs;
-        elapsedTime = timeNow - startTime;
-        remainingTime = secsLimit - elapsedTime;
-        disp(['Time remaining: ' num2str(remainingTime)])
-        disp(['Average job duration: ' num2str(avJobDuration)])
+        [avJobDuration, remainingTime] = findKeyTimes(jobDuration, ...
+            startTime, secsLimit);
 
         if completedJobs(iJob)
             % Nothing to do
@@ -150,24 +145,49 @@ if ~JobContainer.UseParfor
             % There is no time to do anything
             disp('Skipping jobs due to time.')
         else
-            [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
-                mainEval(funNames{iJob}, ...
-                ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
-                startTime, iJob);
+            [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), ...
+                jobDuration(iJob)] = ...
+                    mainEval(funNames{iJob}, ptpntData{iJob}, ...
+                        dsetSpec{iJob}, settings{iJob}, ...
+                        setupValFuns{iJob}, startTime, iJob);
         end
 
     end
 else
-    disp('Using parfor')
+    batchSize = 128;
+    disp(['Using parfor with batch size ' num2str(batchSize)])
     
-    parfor iJob = 1 : numJobs
-        if completedJobs(iJob)
-            % Nothing to do
-        else
-            [AllResults{iJob}, AllLogs{iJob}, completedJobs(iJob), jobDuration(iJob)] = ...
-                mainEval(funNames{iJob}, ...
-                ptpntData{iJob}, dsetSpec{iJob}, settings{iJob}, setupValFuns{iJob}, ...
-                startTime, iJob);
+    numBatches = ceil(numJobs / batchSize);
+    for iBatch = 1 : numBatches
+        thisBatchStart = 1 + ((iBatch-1) * batchSize);
+        thisBatchEnd = iBatch * batchSize;
+        if thisBatchEnd > numJobs
+            assert(iBatch == numBatches)
+            thisBatchEnd = numJobs;
+        end
+        
+        % Should we begin another parfor loop, or should we save the work
+        % so far and stop, due to time
+        [avJobDuration, remainingTime] = findKeyTimes(jobDuration, ...
+            startTime, secsLimit);
+        estBatchDuration = avJobDuration * ...
+            (thisBatchEnd - thisBatchStart + 1);
+        
+        if (estBatchDuration*2) > remainingTime
+            disp(['Skipping batch ' num2str(iBatch) ' due to time.'])
+            continue
+        end
+        
+        parfor iJob = thisBatchStart : thisBatchEnd            
+            if completedJobs(iJob)
+                % Nothing to do
+            else
+                [AllResults{iJob}, AllLogs{iJob}, ...
+                    completedJobs(iJob), jobDuration(iJob)] = ...
+                        mainEval(funNames{iJob}, ptpntData{iJob}, ...
+                        dsetSpec{iJob}, settings{iJob}, ...
+                        setupValFuns{iJob}, startTime, iJob);
+            end
         end
     end
 end
@@ -231,6 +251,22 @@ startTime = (datetimeNow(3) *(24*60*60)) + ...
     (datetimeNow(6));
 
 end
+
+
+function [avJobDuration, remainingTime] = findKeyTimes(jobDuration, ...
+    startTime, secsLimit)
+
+avJobDuration = nanmean(jobDuration);
+if isnan(avJobDuration); avJobDuration = 0; end
+
+timeNow = findTimeInSecs;
+elapsedTime = timeNow - startTime;
+remainingTime = secsLimit - elapsedTime;
+disp(['Time remaining: ' num2str(remainingTime)])
+disp(['Average job duration: ' num2str(avJobDuration)])
+
+end
+
 
 function [AllResults, Logs, completedJobs, jobDuration] = mainEval(funNames, ...
     ptpntData, dsetSpec, settings, setupValFuns, startTime, iJob)
