@@ -61,13 +61,25 @@ elseif strcmp(mergeMode, 'spotlight')
     for iAx = 1 : numAxes
         for iF = 1 : length(inFigs)
             allAx = findall(inFigs(iF), 'type', 'axes');
+            thisLegend = findobj(inFigs(iF), 'Type', 'Legend');
+            if length(thisLegend) ~= 1
+                error(['Must be one (and no more than one) legend ', ...
+                    'in each input figure'])
+            end
 
             % For some reason the axes seem to be ordered in the opposite
             % direction to what I would expect
             origIAx = numAxes - iAx + 1;
             thisAx = allAx(origIAx);
             
-            thisAx.Parent = tilePlt;
+            if (iF == 1) && (iAx == numAxes)
+                % Also want the legend
+                copiedLegAx = copyobj([thisLegend, thisAx], tilePlt);
+                thisAx = copiedLegAx(2);
+            else
+                % Can do things simpler...
+                thisAx.Parent = tilePlt;
+            end
             
             if iF == 1
                 numTilesInFirstRow = widthPerAx*numAxes;
@@ -102,13 +114,6 @@ elseif strcmp(mergeMode, 'spotlight')
                     thisAx.YTickLabels = ...
                         cell(length(thisAx.YTickLabels), 1);
                 end
-            end
-            
-            % Legend
-            if (iF == 1) && (iAx == numAxes)
-                % WORKING HERE -- this not working
-               leg = findobj(inFigs(iF), 'type', 'Legend');
-               copyobj(leg, thisAx);
             end
         end
     end
