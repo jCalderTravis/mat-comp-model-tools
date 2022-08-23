@@ -154,7 +154,7 @@ if ~JobContainer.UseParfor
 
     end
 else
-    batchSize = 4; % dbremove change back to 128
+    batchSize = 128;
     disp(['Using parfor with batch size ' num2str(batchSize)])
     
     % Find number of parallel pool workers
