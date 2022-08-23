@@ -52,7 +52,8 @@ elseif strcmp(mergeMode, 'spotlight')
     assert(length(inFigs), 4)
     numAxes = findNumAxes(inFigs);
     
-    widthPerAx = 3;
+    scaler = 4;
+    widthPerAx = 3*scaler;
     heightPerAx = 4;
     
     tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes, ...
@@ -90,8 +91,10 @@ elseif strcmp(mergeMode, 'spotlight')
             else
                 numPreviousTiles = widthPerAx * (iAx - 1);
                 
-                thisAx.Layout.Tile = numPreviousTiles + iF - 1;
-                thisAx.Layout.TileSpan = [1, 1];
+                thisAx.Layout.Tile = numPreviousTiles ...
+                    + ((iF - 2) * scaler) ...
+                    + 1;
+                thisAx.Layout.TileSpan = [1, scaler];
             end
             
             % Remove some labels?
@@ -114,6 +117,11 @@ elseif strcmp(mergeMode, 'spotlight')
                     thisAx.YTickLabels = ...
                         cell(length(thisAx.YTickLabels), 1);
                 end
+                
+                if iAx > 1
+                    thisAx.YTickLabels = ...
+                        cell(length(thisAx.YTickLabels), 1);
+                end 
             end
         end
     end
@@ -177,6 +185,23 @@ for iAx = 1 : numAxes
         assert(isequal(firstFigAx.YLim, thisAx.YLim))
         assert(isequal(firstFigAx.YTick, thisAx.YTick))
         assert(isequal(firstFigAx.YTickLabel, thisAx.YTickLabel))
+    end
+end
+
+% Also compare y-ticks accross the different axes within the first figure
+allAx = findall(inFigs(1), 'type', 'axes');
+
+if length(allAx) == 1
+    % pass
+else
+    firstAx = allAx(1);
+    
+    for iAx = 2 : length(allAx)
+        thisAx = allAx(iAx);
+        
+        assert(isequal(firstAx.YLim, thisAx.YLim))
+        assert(isequal(firstAx.YTick, thisAx.YTick))
+        assert(isequal(firstAx.YTickLabel, thisAx.YTickLabel))
     end
 end
 

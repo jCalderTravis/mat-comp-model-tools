@@ -18,6 +18,10 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %                   produces a [num trials] long logical of trials to include
 %                   when evaluating this x-variable. Note that trials are only
 %                   included if they meet all inclusion criteria, see 'Series'.
+%   EnforcedBins    vector. Optional. Only use when the corresponding 
+%                   XVars.NumBins is 'prebinned'. The vector gives bin
+%                   values. These bin values will always be plotted even if
+%                   there are no corresponding included trials.
 % 
 % YVars     [num y-variables] long struct array with fields...
 %   ProduceVar      Function handle. Function accepts 'DSet.P(i).Data' (see
@@ -187,13 +191,35 @@ for iPtpnt = 1 : length(DSet.P)
                 bins = unique(ordinalVar);
                 bins(isnan(bins)) = [];
                 
+                % Apply any enforced bins
+                if isfield(XVars(iX), 'EnforcedBins') && (...
+                        ~isempty(XVars(iX).EnforcedBins))
+                    
+                    if ~strcmp(XVars(iX).NumBins, 'prebinned')
+                        error(['This combination of options is ', ...
+                            'not permitted.'])
+                    end
+                    bins = unique([bins(:); XVars(iX).EnforcedBins(:)]);
+                end
+                
                 for iBin = 1 : length(bins)
                     binTrials = ordinalVar == bins(iBin);
                     
-                    % We will use the average xVar value of the data points in
-                    % the bin as the bin's x-position
-                    PtpntPlotData(iY, iX).BinX(iS, iBin, iPtpnt) ...
-                        = mean(xValues(binTrials));
+                    % We will use the average xVar value of the data points
+                    % in the bin as the bin's x-position. If there are no
+                    % cases, which can occour when using EnforcedBins,
+                    % just use the bin value itself.
+                    if sum(binTrials) == 0
+                        assert(isfield(XVars(iX), 'EnforcedBins'))
+                        assert(~isempty(XVars(iX).EnforcedBins))
+                        assert(strcmp(XVars(iX).NumBins, 'prebinned'))
+                        
+                        PtpntPlotData(iY, iX).BinX(iS, iBin, iPtpnt) ...
+                            = bins(iBin);
+                    else
+                        PtpntPlotData(iY, iX).BinX(iS, iBin, iPtpnt) ...
+                            = mean(xValues(binTrials));
+                    end
                     
                     % Compute the y-position
                     PtpntPlotData(iY, iX).BinY(iS, iBin, iPtpnt) ...
@@ -279,6 +305,15 @@ for iPtpnt = 1 : length(DSet.P)
         
         bins = unique(xValues(includedData));
         bins(isnan(bins)) = [];
+        
+        if isfield(XVars(iX), 'EnforcedBins') && (...
+                ~isempty(XVars(iX).EnforcedBins))
+            
+            if ~strcmp(XVars(iX).NumBins, 'prebinned')
+                error('This combination of options is not permitted.')
+            end
+            bins = unique([bins(:); XVars(iX).EnforcedBins(:)]);
+        end
         
         numBins(iS, iPtpnt) = length(bins);
     end
