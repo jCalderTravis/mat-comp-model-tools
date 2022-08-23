@@ -157,6 +157,21 @@ else
     batchSize = 128;
     disp(['Using parfor with batch size ' num2str(batchSize)])
     
+    % Find number of parallel pool workers
+    try
+        pool = gcp('nocreate');
+        if isempty(pool)
+            numWorkers = 1;
+            disp('Could not find parallel pool')
+        else
+            numWorkers = pool.NumWorkers;
+            disp(['Found ' num2str(numWorkers) ' workers.'])
+        end
+    catch
+        numWorkers = 1;
+        disp('Error looking for parallel pool')
+    end
+    
     numBatches = ceil(numJobs / batchSize);
     for iBatch = 1 : numBatches
         thisBatchStart = 1 + ((iBatch-1) * batchSize);
@@ -171,11 +186,15 @@ else
         [avJobDuration, remainingTime] = findKeyTimes(jobDuration, ...
             startTime, secsLimit);
         estBatchDuration = avJobDuration * ...
-            (thisBatchEnd - thisBatchStart + 1);
+            (thisBatchEnd - thisBatchStart + 1) / numWorkers;
+        disp(['Estimated duration of one batch: ' ...
+            num2str(estBatchDuration)])
         
         if (estBatchDuration*2) > remainingTime
             disp(['Skipping batch ' num2str(iBatch) ' due to time.'])
             continue
+        else
+            disp(['Starting batch ' num2str(iBatch) '.'])
         end
         
         parfor iJob = thisBatchStart : thisBatchEnd            

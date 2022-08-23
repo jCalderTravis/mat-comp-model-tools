@@ -56,7 +56,7 @@ elseif strcmp(mergeMode, 'spotlight')
     heightPerAx = 4;
     
     tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes, ...
-        'TileSpacing', 'compact');
+        'TileSpacing', 'compact', 'Padding', 'tight');
     
     for iAx = 1 : numAxes
         for iF = 1 : length(inFigs)
