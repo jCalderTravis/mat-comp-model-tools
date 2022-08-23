@@ -154,7 +154,7 @@ if ~JobContainer.UseParfor
 
     end
 else
-    batchSize = 128;
+    batchSize = 4; % dbremove change back to 128
     disp(['Using parfor with batch size ' num2str(batchSize)])
     
     % Find number of parallel pool workers
@@ -223,8 +223,7 @@ if sum(~completedJobs) == 0
     disp('All jobs completed')
 else
     save(strcat(saveFile{1}, '_PARTIAL'), 'AllResults', 'JobContainer', ...
-        'completedJobs', 'jobDuration')
-    save(strcat(logsSaveFile{1}, '_PARTIAL'), 'AllLogs')
+        'completedJobs', 'jobDuration', 'AllLogs')
     disp(['Saved after ' num2str(sum(completedJobs)) ' of ' ...
         num2str(length(completedJobs)) ' jobs completed.'])
 end
