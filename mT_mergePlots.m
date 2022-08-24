@@ -17,15 +17,26 @@ function finalFig = mT_mergePlots(inFigs, mergeMode, varargin)
 %       and tick labels will be removed from the plots.
 % varargin{1}: bool. Default true. If true, check all input figures have 
 %   the same number of axes and that, the i'th axis across all figures
-%   has the same xlabel, ylabel, and ticks (for all i). 
+%   has the same xlabel, ylabel, and ticks (for all i).
+% varargin{2}: cell array. Vector as long as inFigs. Each element is used
+%   as a label for the subplots that originate from the corresponding
+%   figure.
 
 % OUTPUT
 % finalFig: Figure handle for the combined figure
+
+fontSize = 10;
 
 if (~isempty(varargin)) && (~isempty(varargin{1}))
     checkEquiv = varargin{1};
 else
     checkEquiv = true;
+end
+
+if (length(varargin) >1) && (~isempty(varargin{2}))
+    figLabels = varargin{2};
+else
+    figLabels = {};
 end
 
 if checkEquiv
@@ -56,8 +67,7 @@ elseif strcmp(mergeMode, 'spotlight')
     widthPerAx = 3*scaler;
     heightPerAx = 4;
     
-    tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes, ...
-        'TileSpacing', 'compact', 'Padding', 'tight');
+    tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes);
     
     for iAx = 1 : numAxes
         for iF = 1 : length(inFigs)
@@ -77,6 +87,10 @@ elseif strcmp(mergeMode, 'spotlight')
                 % Also want the legend
                 copiedLegAx = copyobj([thisLegend, thisAx], tilePlt);
                 thisAx = copiedLegAx(2);
+            elseif iF == 1
+                % Copy in the same way as for the above case to ensure
+                % resulting fonts are consistent
+                thisAx = copyobj(thisAx, tilePlt);
             else
                 % Can do things simpler...
                 thisAx.Parent = tilePlt;
@@ -122,6 +136,27 @@ elseif strcmp(mergeMode, 'spotlight')
                     thisAx.YTickLabels = ...
                         cell(length(thisAx.YTickLabels), 1);
                 end 
+            end
+            
+            % Labeling of the subplots
+            if iF == 2 % At the top left of a set of plots
+                plotLable = text(thisAx, ...
+                    0,1.2, ...
+                    ['{\bf ' char(64 + iAx) ' }'], ...
+                    'Units', 'Normalized', ...
+                    'VerticalAlignment', 'Bottom', ...
+                    'HorizontalAlignment', 'left');
+                plotLable.FontSize = fontSize;
+            end
+            
+            if ~isempty(figLabels)
+                plotLable = text(thisAx, ...
+                    1, 1, ...
+                    figLabels{iF}, ...
+                    'Units', 'Normalized', ...
+                    'VerticalAlignment', 'Top', ...
+                    'HorizontalAlignment', 'right');
+                plotLable.FontSize = fontSize;
             end
         end
     end
