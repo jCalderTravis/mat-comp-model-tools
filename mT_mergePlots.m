@@ -14,7 +14,9 @@ function finalFig = mT_mergePlots(inFigs, mergeMode, varargin)
 %       number of axes. The legend from the final axis in the first figure
 %       is copied without checking if this legend applies to any of the 
 %       other plots. If varargin{1} is true, some extraneous labels 
-%       and tick labels will be removed from the plots.
+%       and tick labels will be removed from the plots. Y-axis limits may
+%       (or may not) be changed on the three smaller figures to include 
+%       all data.
 % varargin{1}: bool. Default true. If true, check all input figures have 
 %   the same number of axes and that, the i'th axis across all figures
 %   has the same xlabel, ylabel, and ticks (for all i).
@@ -68,6 +70,7 @@ elseif strcmp(mergeMode, 'spotlight')
     heightPerAx = 4;
     
     tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes);
+    axesToConsiderLimitChange = [];
     
     for iAx = 1 : numAxes
         for iF = 1 : length(inFigs)
@@ -82,6 +85,10 @@ elseif strcmp(mergeMode, 'spotlight')
             % direction to what I would expect
             origIAx = numAxes - iAx + 1;
             thisAx = allAx(origIAx);
+            
+            if iF > 1
+                axesToConsiderLimitChange(end+1) = thisAx;
+            end
             
             if (iF == 1) && (iAx == numAxes)
                 % Also want the legend
@@ -139,7 +146,8 @@ elseif strcmp(mergeMode, 'spotlight')
             end
             
             % Labeling of the subplots
-            if iF == 2 % At the top left of a set of plots
+            if (iF == 2) && (numAxes > 1) % At the top left of a set 
+                % of plots
                 plotLable = text(thisAx, ...
                     0,1.2, ...
                     ['{\bf ' char(64 + iAx) ' }'], ...
@@ -161,7 +169,22 @@ elseif strcmp(mergeMode, 'spotlight')
         end
     end
     
-    
+    % A bit complicated becuase the axes first become out of sync, then 
+    % we have to sync them back up, and we also don't want the limits to
+    % be any smaller than when we started
+    if checkEquiv
+        yLimitsOrig = ylim(axesToConsiderLimitChange(1));
+        axis(axesToConsiderLimitChange, 'auto y')
+        linkaxes(axesToConsiderLimitChange, 'y')
+        yLimits = ylim(axesToConsiderLimitChange(1));
+        
+        if yLimitsOrig(1) < yLimits(1); yLimits(1) = yLimitsOrig(1); end
+        if yLimitsOrig(2) > yLimits(2); yLimits(2) = yLimitsOrig(2); end
+        
+        for iAxForCh = 1 : length(axesToConsiderLimitChange)
+            ylim(axesToConsiderLimitChange(iAxForCh), yLimits)
+        end
+    end
 else
     error('Incorrect use of inputs')
 end
