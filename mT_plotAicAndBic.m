@@ -65,6 +65,7 @@ if ~isempty(predDencity)
     critCounter = critCounter +1;
 end
 
+pltCount = 1;
 for iCrit = 1 : length(infoCrit)
     
     [CritResultsTable, baselinedCrit] = mT_analyseInfoCriterion(infoCrit{iCrit});
@@ -124,6 +125,7 @@ for iCrit = 1 : length(infoCrit)
         xtickangle(90)
     end
     
+    pltCount = addLetterForSubplot(pltCount, fontSize);
     
     % Plot type B: num participants best described
     subPlotObj = subplot(critCounter-1, 2, 2 + ((iCrit -1) *2) );
@@ -165,6 +167,22 @@ for iCrit = 1 : length(infoCrit)
         xtickangle(90)
     end
     
+    pltCount = addLetterForSubplot(pltCount, fontSize);
 end
+
+end
+
+function pltCount = addLetterForSubplot(pltCount, fontSize)
+
+plotLable = text(-0.08, 1.04, ...
+    ['{\bf ' char(64 + pltCount) ' }'], ...
+    'Units', 'Normalized', ...
+    'VerticalAlignment', 'Bottom');
+plotLable.FontSize = fontSize;
+pltCount = pltCount +1;
+
+end
+
+
     
 
