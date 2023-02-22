@@ -67,7 +67,7 @@ Model fitting is performed using settings that are specified in a particular Mat
                     prevent Matlab from having to make a
                     copy in memory of it.
      - `DSet.Spec`       See 'Standard data format' in above.
-- `ParamSets`       \[Num param sets\] long struct array. With fields,
+- `Params`       \[Num param sets\] long struct array. With fields,
   - `Name`
   - `FitLog`          (optional) Fit the logarithm of the 
                     parameter? If set to true, every time
