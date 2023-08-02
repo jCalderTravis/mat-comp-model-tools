@@ -77,7 +77,8 @@ disp(['Job' num2str(jobNum) '     Starts eval''d    ' num2str(toc(funTimer)) ' s
 Logs.AllCandInitialVals = AllCandInitialVals;
 Logs.NegLL = negLL;
 
-[~, bestCand] = min(negLL);
+[minNegLL, bestCand] = min(negLL);
+assert(~isinf(minNegLL))
 SetupValsRaw = AllCandValsUnpacked{bestCand};
 
 % Store the initial parameter values
