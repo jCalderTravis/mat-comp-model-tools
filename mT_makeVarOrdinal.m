@@ -30,11 +30,11 @@ function [ordinalVar, indecisionPoint, varBinProp, breaks] = mT_makeVarOrdinal(.
 
 % OUTPUT
 %   indecisionPoint 
-%           [num block types x 1] array specifying the bin such that to the
-%           right edge of this bin is the CenterPoint
+%           [highest block type number x 1] array specifying the bin such 
+%           that to the right edge of this bin is the CenterPoint
 %   varBinProp
-%           [num conf categories x num block types] array. Represents 
-%           proportion of trials in each confidence category, seperately for
+%           [num bins x num block types] array. Represents 
+%           proportion of trials in each bin, seperately for
 %           the two block types.
 %   breaks  The values on the orgiginal scale (after flipping) where the bin
 %           edges lie
@@ -196,8 +196,15 @@ if ~Settings.SepBinning
     blockTypes = unique(blockType);
     blockTypes(isnan(blockTypes)) = [];
     
-    indecisionPoint = repmat(indecisionPoint, 1, length(blockTypes));
-    assert(isequal(size(indecisionPoint), [1, length(blockTypes)]))
+    blockTypesFlat = nan(1, length(blockTypes));
+    blockTypesFlat(:) = blockTypes;
+    if ~isequal(1:max(blockTypes), blockTypesFlat)
+        error('Case not coded up. See comment.')
+        % To add this case would need to not fill all entries in 
+        % indecision point, becuase not all blocks exist.
+    end
+    
+    indecisionPoint = repmat(indecisionPoint, length(blockTypes), 1);
 end
 
 for iBinGroup = 1 : length(binningGroupsList)    
@@ -248,4 +255,10 @@ for iBlockType = blockTypes'
             / validCases;
     end
 end
+
+
+%% Final checks
+assert(isequal(size(indecisionPoint), [max(blockType), 1]))
+assert(isequal(size(varBinProb), [Settings.NumBins, length(blockTypes)]))
+
 
