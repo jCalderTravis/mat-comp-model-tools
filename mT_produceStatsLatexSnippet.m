@@ -4,6 +4,7 @@ function mT_produceStatsLatexSnippet(resultsTable)
 
 % NOTE
 % For use in latex, need to have the package siunitx
+% Reviewed 17.09.2023
 
 for iStat = 1 : size(resultsTable, 1)
     
