@@ -267,6 +267,6 @@ end
 
 %% Final checks
 assert(isequal(size(indecisionPoint), [max(blockType), 1]))
-assert(isequal(size(varBinProb), [Settings.NumBins, length(blockTypes)]))
+assert(isequal(size(varBinProp), [Settings.NumBins, length(blockTypes)]))
 
 
