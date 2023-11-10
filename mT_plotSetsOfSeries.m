@@ -304,43 +304,29 @@ for iPltRow = 1 : size(PlotData, 1)
 end
                     
 
-%% Make the legends
+%% Make the legend
 
-% Making the legend is a little complicated in this case. We are going
-% to trick MATLAB and draw invisible new lines.
-
-% Set legend
 if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
 
-    if (subplotHeight == 1) && (subplotWidth == 1)
-        % Do nothing, there is only one plot to pick from
-    else
-        subplot(subplotHeight, subplotWidth, subplotIdx(ceil(subplotHeight/2), end));
-        hold on
-    end
+    subplotNum = subplotIdx(ceil(subplotHeight/2), end);
     
-    legendLabels = cell(1, length(PlotStyle.Data));
-    for iLabel = 1 : length(legendLabels)
-        
+    numSeries = length(PlotStyle.Data);
+    legendLabels = cell(1, numSeries);
+    legendColours = cell(1, numSeries);
+    
+    for iLabel = 1 : length(numSeries)
         legendLabels{iLabel} = PlotStyle.Data(iLabel).Name;
-        legendLine(iLabel) = ...
-            errorbar(NaN, NaN, NaN, NaN, ...
-            'Color', PlotStyle.Data(iLabel).Colour, ...
-            'LineWidth', plotLineWidth); 
-    end
-    
-    legObj = legend(legendLine, legendLabels{:});
-    legend boxoff
-    
-    legObj.FontSize = fontSize;
-    legObj.LineWidth = axisLineWidth;
-    legObj.ItemTokenSize(1) = 15;
-    legObj.Location = 'southeast';
-    
-    if isfield(PlotStyle, 'Legend') && isfield(PlotStyle.Legend, 'Title')
-        title(legObj, PlotStyle.Legend.Title)
+        legendColours{iLabel} = PlotStyle.Data(iLabel).Colour;
     end
 
+    if isfield(PlotStyle, 'Legend') && isfield(PlotStyle.Legend, 'Title')
+        legTitle = PlotStyle.Legend.Title;
+    else
+        legTitle = [];
+    end
+    
+    mT_addLegend(figHandle, subplotHeight, subplotWidth, subplotNum, ...
+        legendLabels, legendColours, legTitle, fontSize, axisLineWidth)
 end
 
 
