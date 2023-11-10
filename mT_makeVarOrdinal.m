@@ -7,8 +7,8 @@ function [ordinalVar, indecisionPoint, varBinProp, breaks] = mT_makeVarOrdinal(.
 % Settings  Strcut with fields:
 %           DataType    Should ordinalVar be of the ordinal data type, or should
 %                       it be integers. ('ordinal' or 'integer')
-%           BreakTies   (true or false)
-%           Flip        Use the flip vector or ignore (true or false)
+%           BreakTies   Bool
+%           Flip        Bool. Use the flip vector (true) or ignore (false)
 %           EnforceZeroPoint   Enforce that one of the bin edges is at 
 %                       Settings.CenterPoint.
 %           CenterPoint The value of the center point, in the units used in 'inVar'
@@ -30,15 +30,17 @@ function [ordinalVar, indecisionPoint, varBinProp, breaks] = mT_makeVarOrdinal(.
 
 % OUTPUT
 %   indecisionPoint 
-%           [num block types x 1] array specifying the bin such that to the
-%           right edge of this bin is the CenterPoint
+%           [highest block type number x 1] array specifying the bin such 
+%           that to the right edge of this bin is the CenterPoint
 %   varBinProp
-%           [num conf categories x num block types] array. Represents 
-%           proportion of trials in each confidence category, seperately for
+%           [num bins x num block types] array. Represents 
+%           proportion of trials in each bin, seperately for
 %           the two block types.
 %   breaks  The values on the orgiginal scale (after flipping) where the bin
 %           edges lie
 
+% NOTES
+% Reviewed 17.09.2023
 
 if ~strcmp(Settings.DataType, 'ordinal') && ...
         ~strcmp(Settings.DataType, 'integer')
@@ -112,9 +114,9 @@ binningGroupsList = unique(binningGroup);
 binningGroupsList(isnan(binningGroupsList)) = [];
 
 
-breaks = cell(length(unique(binningGroupsList)), 1);
-ordinalVarByBlock = cell(length(unique(binningGroupsList)), 1);
-indecisionPoint = cell(max(unique(binningGroupsList)), 1);
+breaks = cell(length(binningGroupsList), 1);
+ordinalVarByBlock = cell(length(binningGroupsList), 1);
+indecisionPoint = cell(max(binningGroupsList), 1);
 
 for iBinGroup = 1 : length(binningGroupsList)
     currentBin = binningGroupsList(iBinGroup);
@@ -153,7 +155,6 @@ for iBinGroup = 1 : length(binningGroupsList)
     if strcmp(Settings.DataType, 'ordinal')
         ordinalVarByBlock{iBinGroup} = ordinal(contVar, ...
             bins, [], breaks{iBinGroup});
-        warning('This case is work in progress.')
         
     elseif strcmp(Settings.DataType, 'integer')
         ordinalVarByBlock{iBinGroup} = ...
@@ -161,20 +162,19 @@ for iBinGroup = 1 : length(binningGroupsList)
     end
 end
 
-% Code check
 if length(breaks) ~= length(ordinalVarByBlock)
     error('bug')
 end
 
-% Combine data from the seperate block-wise binning procedures. First, fill a
-% vector with NaNs or undefined.
+% Combine data from the seperate block-wise binning procedures. First, fill 
+% a vector with NaNs or undefined.
 if strcmp(Settings.DataType, 'ordinal')
-    warning('This case is work in progress.')
     
     ordinalVar = ordinalVarByBlock{1};
     firstUndefined = find(isundefined(ordinalVar));
     
-    % If there were no undefined trials in block 1, try and find them in block 2
+    % If there were no undefined trials in block 1, try and find them in 
+    % block 2
     if isempty(firstUndefined) && (length(ordinalVarByBlock) >1)
         ordinalVar = ordinalVarByBlock{2};
         firstUndefined = find(isundefined(ordinalVar));
@@ -184,20 +184,31 @@ if strcmp(Settings.DataType, 'ordinal')
     if ~isempty(firstUndefined)
         firstUndefined = firstUndefined(1);
         ordinalVar(:) = ordinalVar(firstUndefined);
+    else
+        error('Case not coded up.')
     end
+    
 elseif strcmp(Settings.DataType, 'integer')
     ordinalVar = NaN(size(ordinalVarByBlock{1}));
-    assert(isequal(size(ordinalVar), size(inVar)))
 end
 
-% If we have binned all data together, still provide a indecision point for each
-% block.
+assert(isequal(size(ordinalVar), size(inVar)))
+
+% If we have binned all data together, still provide a indecision point 
+% for each block.
 if ~Settings.SepBinning
     blockTypes = unique(blockType);
     blockTypes(isnan(blockTypes)) = [];
     
-    indecisionPoint = repmat(indecisionPoint, 1, length(blockTypes));
-    assert(isequal(size(indecisionPoint), [1, length(blockTypes)]))
+    blockTypesFlat = nan(1, length(blockTypes));
+    blockTypesFlat(:) = blockTypes;
+    if ~isequal(1:max(blockTypes), blockTypesFlat)
+        error('Case not coded up. See comment.')
+        % To add this case would need to not fill all entries in 
+        % indecision point, becuase not all blocks exist.
+    end
+    
+    indecisionPoint = repmat(indecisionPoint, length(blockTypes), 1);
 end
 
 for iBinGroup = 1 : length(binningGroupsList)    
@@ -239,6 +250,10 @@ blockTypes(isnan(blockTypes)) = [];
 varBinProp = NaN(length(bins), length(blockTypes));
 
 % Seperately for each block
+if ~isequal(blockTypes', 1:length(blockTypes))
+    error('This case has not been implimented for the below for loop')
+end
+
 for iBlockType = blockTypes'
     validCases = sum(~isnan(inVar(blockType == iBlockType)));
 
@@ -248,4 +263,10 @@ for iBlockType = blockTypes'
             / validCases;
     end
 end
+
+
+%% Final checks
+assert(isequal(size(indecisionPoint), [max(blockType), 1]))
+assert(isequal(size(varBinProp), [Settings.NumBins, length(blockTypes)]))
+
 

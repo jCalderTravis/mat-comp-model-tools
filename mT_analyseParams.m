@@ -10,6 +10,9 @@ function resultsTable = mT_analyseParams(paramData, paramNames, varargin)
 % TESTING
 % If pass paramData as the string 'test', runs tests instead.
 
+% NOTES
+% Reviewed 17.09.2023
+
 if strcmp(paramData, 'test')
     testFun()
     return
