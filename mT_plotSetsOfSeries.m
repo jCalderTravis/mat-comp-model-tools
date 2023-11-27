@@ -75,14 +75,9 @@ for iSubplot = 1 : length(PlotData(:))
     end
 end
 
-% Matlab uses a particualar numbering system for subplots. Find an array
-% that converts from matrix index to matlab subplot number.
 subplotHeight = size(PlotData, 1);
 subplotWidth = size(PlotData, 2);
-
-subplotIdx = NaN(subplotWidth, subplotHeight);
-subplotIdx(:) = 1 : length(subplotIdx(:));
-subplotIdx = subplotIdx';
+subplotIdx = mT_createSubplotIdxArray(subplotWidth, subplotHeight);
 
 % Make a new figure or use an existing one?
 if isempty(varargin)    
@@ -306,10 +301,7 @@ end
 
 %% Make the legend
 
-if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
-
-    subplotNum = subplotIdx(ceil(subplotHeight/2), end);
-    
+if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')  
     numSeries = length(PlotStyle.Data);
     legendLabels = cell(1, numSeries);
     legendColours = cell(1, numSeries);
@@ -325,8 +317,8 @@ if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
         legTitle = [];
     end
     
-    mT_addLegend(figHandle, subplotHeight, subplotWidth, subplotNum, ...
-        legendLabels, legendColours, legTitle, fontSize, axisLineWidth)
+    mT_addLegend(figHandle, legendLabels, legendColours, legTitle, ...
+        fontSize, axisLineWidth)
 end
 
 
