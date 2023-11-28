@@ -92,16 +92,9 @@ end
 for iPltRow = 1 : size(PlotData, 1)
     for iPltCol = 1 : size(PlotData, 2)
         
-        % Do the plotting itself
-        if (subplotHeight == 1) && (subplotWidth == 1)
-            subplotObj = gca;
-            hold on    
-        else
-            subplotObj = subplot(subplotHeight, subplotWidth, ...
-                subplotIdx(iPltRow, iPltCol));
-            hold on
-        end
-        
+        subplotObj = mT_getAxisWithoutOverwrite(figHandle, ...
+            subplotHeight, subplotWidth, subplotIdx(iPltRow, iPltCol));
+
         subplotObj.LineWidth = axisLineWidth;
         subplotObj.FontSize = fontSize;
         

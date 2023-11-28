@@ -14,23 +14,24 @@ function mT_addLegend(figHandle, legendLabels, legendColours, title, ...
 
 assert(length(legendLabels) == length(legendColours))
 
-if isempty(fontSize)
+if ~exist('fontSize', 'var')
     fontSize = 10;
 end
 
-if isempty(lineWidth)
+if ~exist('lineWidth', 'var')
     lineWidth = 1;
 end
 
 % Find shape of subplots
-findSubplotSize = @(i) length([figHandle.Children(:).Position(i)]);
-subplotWidth = findSubplotSize(1);
-subplotHeight = findSubplotSize(2);
+subplotWidth = findNumSubplots(figHandle, 1);
+subplotHeight = findNumSubplots(figHandle, 2);
 subplotIdx = mT_createSubplotIdxArray(subplotWidth, subplotHeight);
 
 set(0, 'currentFigure', figHandle)
 subplotNum = subplotIdx(ceil(subplotHeight/2), end);
-subplot(subplotHeight, subplotWidth, subplotNum);
+mT_getAxisWithoutOverwrite(figHandle, subplotHeight, subplotWidth, ...
+    subplotNum);
+
 hold on
 
 for iLabel = 1 : length(legendLabels)
@@ -46,6 +47,25 @@ legObj.LineWidth = lineWidth;
 legObj.ItemTokenSize(1) = 15;
 legObj.Location = 'southeast';
 
-if ~isempty(title)
+if exist('title', 'var') && ~isempty(title)
     title(legObj, title)
 end
+
+end
+
+
+function numSubplots = findNumSubplots(figHandle, axis)
+
+positions = [];
+currentAxes = findobj(get(figHandle, 'Children'), 'type', 'axes', ...
+    '-depth', 1);
+for iC = 1 : length(currentAxes)
+    positions = [positions, currentAxes(iC).Position(axis)];
+end
+
+numSubplots = length(unique(positions));
+
+end
+
+
+
