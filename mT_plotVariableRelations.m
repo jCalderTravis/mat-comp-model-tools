@@ -71,6 +71,8 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %       Same fields as Xaxis, and...
 %       RefVal      optional. Plots a reference line at specified y-val.
 %                   For no line set to NaN.
+%       SigHeight   optional. The height in data coordinates on the y-axis
+%                   to plot lines indicating significance.
 %   Data [num series] long strcut array with fields...
 %       Name        Name of the series (for legend, optional)
 %       PlotType    'scatter' (scattered error bars), 'scatterOnly' (just 
@@ -83,11 +85,18 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %   Annotate [size(PlotData, 2)]*[size(PlotData, 1)] struct array with fields...
 %       Text        Containing text to add to the plot
 % varargin{1}  Figure handle for the figure to plot onto. If the old figure
-%           has the same subplot structure, then all the data in the old
-%           subplots will be retianed.
+%   has the same subplot structure, then all the data in the old
+%   subplots will be retianed.
 % varagin{2} If set to 'median' use median for averaging over participants.
-% Otherwise set to 'mean' or don't use (default is 'mean'). Note in the case of
-% 'median' error bars still reflect SEM, which doesn't really make sense.
+%   Otherwise set to 'mean' or don't use (default is 'mean'). Note in the 
+%   case of 'median' error bars still reflect SEM, which doesn't really make 
+%   sense.
+% varargin{3}: string filepath. If provided, cluster-based statistics are
+%   performed and signiifcant points are indicated on the plot. The 
+%   provided filepath is used for saving temporary files. May only be used
+%   for series where PlotStyle.Data(iS).PlotType is 'scatter', to avoid 
+%   ambiguitiy (multiple series may use the same colour but different 
+%   plot types, but significant points are only indicated through colour).
 
 
 if (~isempty(varargin)) && (~isempty(varargin{1}))
@@ -104,6 +113,12 @@ else
 end
 
 if ~ismember(averaging, {'mean', 'median'}); error('Incorrect input.'); end
+
+if (length(varargin)>=3) && (~isempty(varargin{3}))
+    sigTmpDir = varargin{3};
+else
+    sigTmpDir = [];
+end
 
 
 %% Binning per participant
@@ -260,6 +275,37 @@ for iY = 1 : length(YVars)
             AvPlotData(iY, iX).Yvals(iS).Vals = averageYdata(iS, :);
             AvPlotData(iY, iX).Yvals(iS).UpperError = SEM(iS, :);
             AvPlotData(iY, iX).Yvals(iS).LowerError = SEM(iS, :);
+
+            % Significance testing
+            if ~isempty(sigTmpDir)
+                if ~strcmp(PlotStyle.Data(iS).PlotType, 'scatter')
+                    error('See comments at beginning of function')
+                end
+
+                % Perform cluster-based permutation tests assuming that
+                % the data are ordered, so check this.
+                theseXVals = AvPlotData(iY, iX).Xvals(iS).Vals;
+                assert(all(diff(theseXVals(:))>0))
+
+                sigNumPtpnt = length(DSet.P);
+                sigNumBins = length(theseXVals);
+                allPtpntYVals = PtpntPlotData(iY, iX).BinY(iS, :, :);
+                assert(sigNumPtpnt == size(allPtpntYVals, 3))
+                assert(sigNumBins == size(allPtpntYVals, 2))
+
+                allPtpntYVals = permute(allPtpntYVals, [3, 2, 1]);
+                assert(isequal(size(allPtpntYVals), ...
+                    [sigNumPtpnt, sigNumBins]))
+                
+                [~, sig] = mT_runPermutationTest(allPtpntYVals, sigTmpDir);
+                assert(isequal(size(sig), [sigNumBins, 1]))
+                AvPlotData(iY, iX).Yvals(iS).Sig = sig;
+                
+                if ~any(sig)
+                    disp(['Significance testing was perfromed ', ...
+                        'but no points achieved significance.'])
+                end
+            end
         end
     end
 end

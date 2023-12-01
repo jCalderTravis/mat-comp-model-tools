@@ -5,15 +5,18 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 % PlotData [subplots in y-drection by subplots in x-direction] strct array,
 % with fields...
 %   Xvals   Either single strcutre or [num series] long strcut array with
-%           fields...
-%       Vals        The i-th structure should contain the x-values for the i-th
-%                   series. If the Xvals strcuture is only 1 long, these these
-%                   values will be used for all series.
+%           fields the below fields. If a single structure, will be used 
+%           for all series.
+%       Vals    The i-th structure should contain the x-values for the i-th
+%               series. 
 %   Yvals   [num series] long struct array with fields...
 %       Vals
 %       Fade        optional
 %       UpperError  Distance from Val
 %       LowerError  Unsigned distance from Val
+%       Sig         optional. Vector of bool. As long as vals. Where true, 
+%                   a flat line in the colour of the corresponding series 
+%                   will be drawn to indicate a significant datapoint.
 %   
 % PlotStyle struct array with fields...
 %   General
@@ -34,6 +37,8 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %       Same fields as Xaxis, and...
 %       RefVal      optional. Plots a reference line at specified y-val.
 %                   For no line set to NaN.
+%       SigHeight   optional. The height in data coordinates on the y-axis
+%                   to plot lines indicating significance.
 %   Data [num series] long strcut array with fields...
 %       Name        Name of the series (for legend, optional)
 %       PlotType    'scatter' (scattered error bars), 'scatterOnly' (just 
@@ -131,20 +136,40 @@ for iPltRow = 1 : size(PlotData, 1)
                 PlotStyle.Data(iSeries).MarkerType = plottingMarker;                
             end
             
-            % Has fading been requested? If not set all fade values to 1
+            % Has fading / significance been requested? If not set to 
+            % defaults.
             if ~isfield(PlotData(iPltRow, iPltCol).Yvals(iSeries), 'Fade') ...
-                    || isempty(PlotData(iPltRow, iPltCol).Yvals(iSeries).Fade)
+                || isempty(PlotData(iPltRow, iPltCol).Yvals(iSeries).Fade)
                 
                 PlotData(iPltRow, iPltCol).Yvals(iSeries).Fade = ...
                     ones(size( ...
-                    PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals));
+                        PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals));
+            end
+
+            if ~isfield(PlotData(iPltRow, iPltCol).Yvals(iSeries), 'Sig') ...
+                || isempty(PlotData(iPltRow, iPltCol).Yvals(iSeries).Sig)
+                
+                PlotData(iPltRow, iPltCol).Yvals(iSeries).Sig = ...
+                    false(size( ...
+                        PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals));
+            end
+
+            if isfield(PlotStyle.Yaxis(iPltRow), 'SigHeight') && ...
+                    ~isempty(PlotStyle.Yaxis(iPltRow).SigHeight)
+                
+                sigHeight = PlotStyle.Yaxis(iPltRow).SigHeight;
+            else
+                sigHeight = 0;
             end
             
             
             % Loop through and plot every point
-            numPoints = length(PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals);
+            numPoints = length( ...
+                PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals);
             assert(numPoints == ...
                 length(PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals))
+            assert(numPoints == ...
+                length(PlotData(iPltRow, iPltCol).Yvals(iSeries).Sig))
             
             for iXpos = 1 : numPoints
                 
@@ -158,6 +183,8 @@ for iPltRow = 1 : size(PlotData, 1)
                     PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals(iXpos);
                 currentY = ...
                     PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals(iXpos);
+                currentSig = ...
+                    PlotData(iPltRow, iPltCol).Yvals(iSeries).Sig(iXpos);
                     
                 
                 % What type of plot are we doing?
@@ -180,13 +207,6 @@ for iPltRow = 1 : size(PlotData, 1)
                     
                 elseif any(strcmp(PlotStyle.Data(iSeries).PlotType, ...
                         {'line', 'thickLine'}))
-                    % Fading will determine half of the line/shading to
-                    % the right and half of the line/shading to the left of the
-                    % Xval, for line plots.                 
-                    currentX = ...
-                        PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals(iXpos);
-                    currentY = ...
-                        PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals(iXpos);
                     
                     if strcmp(PlotStyle.Data(iSeries).PlotType, ...
                             'thickLine')
@@ -194,40 +214,11 @@ for iPltRow = 1 : size(PlotData, 1)
                     else
                         thisWidth = plotLineWidth;
                     end
+                    xVals = PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals;
+                    yVals = PlotData(iPltRow, iPltCol).Yvals(iSeries).Vals;
 
-                    % Start with the lines to the right of the point. There
-                    % is nothing to draw to the right if this is the final
-                    % data point.
-                    if iXpos < numPoints
-                        nextX = ...
-                            PlotData(iPltRow, iPltCol ...
-                            ).Xvals(iSeries).Vals(iXpos +1);
-                        nextY = ...
-                            PlotData(iPltRow, iPltCol ...
-                            ).Yvals(iSeries).Vals(iXpos +1);
-                        
-                        plot([currentX, (currentX + nextX)/2], ...
-                            [currentY, (currentY + nextY)/2], ...
-                            'Color', colourIncFade, ...
-                            'LineWidth', thisWidth);
-                    end
-
-                    % Now the lines to the left of the point. There
-                    % is nothing to draw to the right if this is the first
-                    % data point.
-                    if iXpos > 1
-                        prevX = ...
-                            PlotData(iPltRow, iPltCol ...
-                            ).Xvals(iSeries).Vals(iXpos -1);
-                        prevY = ...
-                            PlotData(iPltRow, iPltCol ...
-                            ).Yvals(iSeries).Vals(iXpos -1); 
-                        
-                        plot([(prevX + currentX)/2, currentX], ...
-                            [(prevY + currentY)/2, currentY], ...
-                            'Color', colourIncFade, ...
-                            'LineWidth', thisWidth);
-                    end
+                    mT_lineToSides(xVals, yVals, iXpos, colourIncFade, ...
+                        thisWidth)
                     
                 elseif strcmp(PlotStyle.Data(iSeries).PlotType, ...
                         'errorShading')
@@ -260,6 +251,14 @@ for iPltRow = 1 : size(PlotData, 1)
                     end
                 else
                     error('Unknown plot type requested')
+                end
+
+                % Significance lines
+                if PlotData(iPltRow, iPltCol).Yvals(iSeries).Sig(iXpos)
+                    xVals = PlotData(iPltRow, iPltCol).Xvals(iSeries).Vals;
+
+                    mT_lineToSides(xVals, sigHeight, iXpos, ...
+                        colourIncFade, plotLineWidth*5)
                 end
             end
         end
