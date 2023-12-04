@@ -6,6 +6,9 @@ Author: Joshua Calder-Travis, j.calder.travis@gmail.com
 
 _Those sections of the code used in associated papers and preprints have been carefully checked. Nevertheless, no guarantee or warranty is provided for any part of the code._
 
+## Setup
+If using the [MNE-based](https://mne.tools/stable/index.html) permutation testing functionality, you will neeed to change the function `mT_findEnvInfo` so that the returned variable describes the location of conda and a conda environment with MNE-installed. See comments of that function for details. 
+
 ## Key variables
 Certain variables are used in many different functions, and are documented below.
 
