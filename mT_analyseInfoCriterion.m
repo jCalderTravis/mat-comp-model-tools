@@ -11,6 +11,9 @@ function [ResultsTable, baselinedCrit] = mT_analyseInfoCriterion(infoCrit)
 % TESTING
 % If pass infoCrit as the string 'test', runs tests instead.
 
+% HISTORY
+% Reviewed 2020
+
 if strcmp(infoCrit, 'test')
     testFun()
     return

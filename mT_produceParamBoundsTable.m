@@ -11,6 +11,9 @@ function mT_produceParamBoundsTable(AllParamBounds, dir, varargin)
 % NOTE
 % For use in latex, need to have the package siunitx
 
+% HISTORY
+% Reviewed 2020
+
 if length(varargin)>=1 && ~isempty(varargin{1})
     ParamLabels = varargin{1};
 else

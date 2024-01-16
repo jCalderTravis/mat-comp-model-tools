@@ -14,6 +14,9 @@ function FigureHandles = mT_compareInfoCritAcrossDatasets(AllDSets, ...
 % varargin{1}: numModels long cell array of model names to use instead of 
 % simply numebering the models
 
+% HISTORY
+% Reviewed 2020
+
 % Process input
 if (~isempty(varargin)) && (~isempty(varargin{1}))
     modelNames = varargin{1};

@@ -17,6 +17,9 @@ function DSet = mT_scheduleFits(mode, DSet, Settings, scheduleFolder)
 %           already exists, in which case 'Models' becomes a struct array and 
 %           the current results are placed in the first free space.
 
+% HISTORY
+% Reviewed 2020
+
 jobsPerContainer = Settings.JobsPerContainer;
 
 for iSet = 1 : length(Settings)

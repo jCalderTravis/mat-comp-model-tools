@@ -13,6 +13,9 @@ function DSet = mT_findBestFit(DSet, varargin)
 %   produced and placed in DSet.P(i).Models(j).BestFit will only contain
 %   the fields LL and Params.
 
+% HISTORY
+% Reviewed 2020
+
 if (length(varargin) > 0) && (~isempty(varargin{1}))
     minProcOnly = varargin{1};
 else

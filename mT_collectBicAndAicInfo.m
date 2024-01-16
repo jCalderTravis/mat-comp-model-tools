@@ -3,6 +3,9 @@ function [aicData, bicData] = mT_collectBicAndAicInfo(DSet)
 % DSet.P(i).Models(j).BestFit.Bic, or Aic, for all models and participants and
 % produces a [numModels x numParticipants] arrays for each.
 
+% HISTORY
+% Reviewed 2020
+
 % Check the same models have been applied to all participants, and in same order
 mT_findAppliedModels(DSet);
 

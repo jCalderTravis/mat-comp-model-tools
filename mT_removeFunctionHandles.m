@@ -13,6 +13,9 @@ function dataStruct = mT_removeFunctionHandles(dataStruct, exceptions)
 % if the function handles are only in the structure as a record and will not be
 % used again.
 
+% HISTORY
+% Reviewed 2020
+
 if nargin < 2
     exceptions = {};
 end

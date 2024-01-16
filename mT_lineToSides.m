@@ -12,6 +12,9 @@ function mT_lineToSides(xVals, yVals, iPos, colourIncFade, lineWidth)
 %   (Length 4 to also plot with a specific fade level.)
 % lineWidth: scalar. Width of the plotted line.
 
+% HISTORY
+% Reviewed 16.01.2024
+
 numPoints = length(xVals);
 if length(yVals) == 1
     yVals = repmat(yVals, numPoints, 1);

@@ -15,6 +15,9 @@ function DSet = mT_collectResults(DSet, scheduleFolder, removeStartCand,...
 % alreadyUnpacked: boolean. Have the results from the cluster aleady been 
 % upacked. If true, skips the upacking of the results files.
 
+% HISTORY
+% Reviewed 2020
+
 if allowMissing
     excludedPtpnts = [];
 end

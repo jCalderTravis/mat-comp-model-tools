@@ -54,6 +54,10 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %           has the same subplot structure, then all the data in the old
 %           subplots will be retianed.
 
+% HISTORY
+% Reviewed 2020
+% Significance testing added 2023
+
 if ~isfield(PlotStyle, 'General') || strcmp(PlotStyle.General, 'computer')
     plotLineWidth = 4;
     axisLineWidth = 4;

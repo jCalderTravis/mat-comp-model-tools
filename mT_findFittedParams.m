@@ -13,7 +13,7 @@ function fittedParams = mT_findFittedParams(DSet, modelNum)
 
 % HISTORY
 % 2021, JCT
-% 27.02.2023 Read through, including any called functions from this repo
+% 27.02.2023 Read through
 
 fittedParams = cell(length(DSet.P), 1);
 

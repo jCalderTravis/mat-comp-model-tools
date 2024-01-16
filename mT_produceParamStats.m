@@ -16,6 +16,9 @@ function paramMedian = mT_produceParamStats(DSet, dir, varargin)
 % NOTE
 % For use in latex, need to have the package siunitx
 
+% HISTORY
+% Reviewed 2020
+
 models = mT_findAppliedModels(DSet);
 
 if ~isempty(varargin) && ~isempty(varargin{1})

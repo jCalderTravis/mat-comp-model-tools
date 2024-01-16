@@ -2,6 +2,9 @@ function models = mT_findAppliedModels(DSet)
 % Check all participants have the same models fitted, in the same order, and 
 % return these models in a cell array.
 
+% HISTORY
+% Reviewed 2020
+
 % Find participant 1 models
 models = {};
 for iModel = 1 : length(DSet.P(1).Models)

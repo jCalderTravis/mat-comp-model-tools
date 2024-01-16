@@ -13,6 +13,9 @@ function mT_runOnCluster(jobDirectory, jobFile, resuming, timelimit, varargin)
 % Specified in the format used by slurm.
 % varargin: If set to 'debug', MATLAB does not quit on error
 
+% HISTORY
+% Reviewed 2020
+
 disp('Key input arguments...')
 disp(['jobDirectory: ' jobDirectory '; of type ' class(jobDirectory)])
 disp(['jobFile: ' jobFile '; of type ' class(jobFile)])

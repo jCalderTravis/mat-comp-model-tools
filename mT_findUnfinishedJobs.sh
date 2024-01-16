@@ -3,6 +3,9 @@
 # INPUT
 # First input should be the directory in which to look for jobs
 
+# HISTORY
+# Reviewed 16.01.2024
+
 searchDir=$1
 
 # Find all jobs

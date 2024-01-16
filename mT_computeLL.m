@@ -6,6 +6,9 @@ function LL = mT_computeLL(Settings, PtpntData, DSetSpec, paramVector)
 % and the one passed to feval in Settings.ComputeTrialLL.Args.
 % Solution: Always pass find included trials to feval?
 
+% HISTORY
+% Reviewed 2020
+
 if ~Settings.SuppressOutput
     tic
 end
