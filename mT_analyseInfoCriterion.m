@@ -24,12 +24,12 @@ end
 modelNums = [1 : size(infoCrit, 1)]';
 
 % Baseline and aggregate infoCrit
-[baselineMean, baselineModel] = min(nanmean(infoCrit, 2));
+[baselineMean, baselineModel] = min(mean(infoCrit, 2));
 baselinedCrit = infoCrit - infoCrit(baselineModel, :);
-meanInfoCrit = nanmean(baselinedCrit, 2);
+meanInfoCrit = mean(baselinedCrit, 2);
 
 assert(isequal(round(meanInfoCrit, 7), ...
-    round(nanmean(infoCrit, 2) - baselineMean, 7)))
+    round(mean(infoCrit, 2) - baselineMean, 7)))
 
 % Confidence intervals around aggregate
 meanCI = NaN(size(infoCrit, 1), 2);
@@ -40,7 +40,7 @@ for iModel = 1 : size(infoCrit, 1)
     if iModel == baselineModel; continue; end
     
     critVals = baselinedCrit(iModel, :)';
-    meanCI(iModel, :) = bootci(10000, @(vals) nanmean(vals), critVals);
+    meanCI(iModel, :) = bootci(10000, @(vals) mean(vals), critVals);
     
 end
 
@@ -66,7 +66,7 @@ if any(isnan(infoCritWithNoNans)); error('Bug'); end
 
 numBestFit = NaN(length(modelNums), 1);
 for iModel = modelNums'
-    numBestFit(iModel) = nansum(bestFit == iModel);
+    numBestFit(iModel) = sum(bestFit == iModel);
 end
 assert(sum(numBestFit) == (size(infoCrit, 2)- sum(excludedParticipants)))
 
