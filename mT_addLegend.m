@@ -1,4 +1,4 @@
-function mT_addLegend(figHandle, legendLabels, legendColours, title, ...
+function mT_addLegend(figHandle, legendLabels, legendColours, legTitle, ...
     fontSize, lineWidth)
 % Add a legend to a plot/subplot by drawing new invisible lines.
 
@@ -8,7 +8,7 @@ function mT_addLegend(figHandle, legendLabels, legendColours, title, ...
 %   to the legend.
 % legendColours: cell array of 3-element vectors. Gives the colours for the
 %   series described in legendLabels.
-% title: empty or str. Provide legend title, if desired.
+% legTitle: empty or str. Provide legend title, if desired.
 % fontSize: scalar. Font size for legend. May be empty to use default.
 % lineWidth: scalar. Line width for legend. May be empty to use default.
 
@@ -47,8 +47,8 @@ legObj.LineWidth = lineWidth;
 legObj.ItemTokenSize(1) = 15;
 legObj.Location = 'southeast';
 
-if exist('title', 'var') && ~isempty(title)
-    title(legObj, title)
+if exist('title', 'var') && ~isempty(legTitle)
+    title(legObj, legTitle)
 end
 
 end

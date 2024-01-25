@@ -302,7 +302,7 @@ if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
     legendLabels = cell(1, numSeries);
     legendColours = cell(1, numSeries);
     
-    for iLabel = 1 : length(numSeries)
+    for iLabel = 1 : numSeries
         legendLabels{iLabel} = PlotStyle.Data(iLabel).Name;
         legendColours{iLabel} = PlotStyle.Data(iLabel).Colour;
     end

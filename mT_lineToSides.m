@@ -22,7 +22,7 @@ end
 assert(length(yVals) == numPoints)
 assert(all(diff(xVals(:))>=0))
 assert((size(xVals, 2) == 1) || (size(xVals, 1) == 1))
-assert(size(yVals, 2) == 1)
+assert((size(yVals, 2) == 1) || (size(yVals, 1) == 1))
 
 currentX = xVals(iPos);
 currentY = yVals(iPos);
