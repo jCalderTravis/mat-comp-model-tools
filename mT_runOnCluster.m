@@ -13,6 +13,14 @@ function mT_runOnCluster(jobDirectory, jobFile, resuming, timelimit, varargin)
 % Specified in the format used by slurm.
 % varargin: If set to 'debug', MATLAB does not quit on error
 
+if ~isempty(varargin) && strcmp(varargin{1}, 'debug')
+    inDebugMode = true;
+    disp('System     Debug mode ON')
+else
+    inDebugMode = false;
+    disp('System     Debug mode OFF')
+end
+
 disp('Key input arguments...')
 disp(['jobDirectory: ' jobDirectory '; of type ' class(jobDirectory)])
 disp(['jobFile: ' jobFile '; of type ' class(jobFile)])
@@ -44,14 +52,6 @@ startTime = findTimeInSecs;
 timeNow = findTimeInSecs;
 disp(['System     Timing setup        ' ...
                 num2str((timeNow - startTime)/60) ' mins.'])
-            
-if ~isempty(varargin) && strcmp(varargin{1}, 'debug')
-    inDebugMode = true;
-    disp('System     Debug mode ON')
-else
-    inDebugMode = false;
-    disp('System     Debug mode OFF')
-end
 
 % Load data
 LoadedVars = load(jobFile);
@@ -247,10 +247,10 @@ catch erMsg
      for i = 1 : length(erMsg.stack)
          disp(erMsg.stack(i))
      end
-     
+
      % Quit unless in debug mode
      if ~inDebugMode
-        disp('Exiting after crash')
+         disp('Exiting after crash')
          exit
      end
 end
