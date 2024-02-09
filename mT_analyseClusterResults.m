@@ -23,6 +23,9 @@ function [AllDSets, FigureHandles] = mT_analyseClusterResults(directory, ...
 % the results of the fitting on the cluster attached.
 % FigureHandles: Structure containing figure handles for key figures
 
+% HISTORY
+% Reviewed 2020
+
 % Process input
 if (~isempty(varargin)) && (~isempty(varargin{1}))
     modelNames = varargin{1};

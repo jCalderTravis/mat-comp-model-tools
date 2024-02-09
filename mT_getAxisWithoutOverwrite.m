@@ -14,6 +14,9 @@ function subplotObj = mT_getAxisWithoutOverwrite(figHandle, ...
 % OUTPUT
 % subplotObj: Handle to the subplot that we want to use.
 
+% HISTORY
+% Reviewed 16.01.2024
+
 set(0, 'currentFigure', figHandle)
 
 if (subplotHeight == 1) && (subplotWidth == 1)

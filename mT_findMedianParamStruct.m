@@ -5,6 +5,9 @@ function MedianParams = mT_findMedianParamStruct(DSet, modelNum)
 % TESTING
 % If pass DSet as the string 'test', runs tests instead.
 
+% HISTORY
+% Reviewed 2020
+
 if strcmp(DSet, 'test')
     testFun()
     return

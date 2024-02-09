@@ -10,6 +10,9 @@ function outData = mT_packUnpackParams(direction, Settings, inData)
 % field 'Params' is used to determine how to pack and unpack.
 % inData: The param data
 
+% HISTORY
+% Reviewed 2020
+
 if length(Settings) ~= 1; error('Incorrect use of input arguments'); end
 
 if strcmp(direction, 'packTest')

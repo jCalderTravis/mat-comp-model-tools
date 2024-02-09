@@ -11,7 +11,7 @@ function finalFig = mT_mergePlots(inFigs, mergeMode, varargin)
 %       figures smaller, above this. inFigs must be 4 figures long. If
 %       the input figures have more than a single axis, then this operation
 %       will be repeated for each axis. All figures must have the same
-%       number of axes. The legend from the final axis in the first figure
+%       number of axes. The legend from the the first figure
 %       is copied without checking if this legend applies to any of the 
 %       other plots. If varargin{1} is true, some extraneous labels 
 %       and tick labels will be removed from the plots. Y-axis limits may
@@ -26,6 +26,9 @@ function finalFig = mT_mergePlots(inFigs, mergeMode, varargin)
 
 % OUTPUT
 % finalFig: Figure handle for the combined figure
+
+% HISTORY
+% Reviewed 17.01.2024
 
 fontSize = 10;
 
@@ -69,7 +72,7 @@ elseif strcmp(mergeMode, 'spotlight')
     widthPerAx = 3*scaler;
     heightPerAx = 4;
     
-    tilePlt = tiledlayout(finalFig, 4, widthPerAx*numAxes);
+    tilePlt = tiledlayout(finalFig, heightPerAx, widthPerAx*numAxes);
     axesToConsiderLimitChange = [];
     
     for iAx = 1 : numAxes
@@ -130,9 +133,8 @@ elseif strcmp(mergeMode, 'spotlight')
                        retainOnlyEndElements(thisAx.XTickLabels);
                    thisAx.YTickLabels = ...
                        retainOnlyEndElements(thisAx.YTickLabels);
-                end
-                
-                if iF > 2
+
+                elseif iF > 2
                     thisAx.XTickLabels = ...
                         cell(length(thisAx.XTickLabels), 1);
                     thisAx.YTickLabels = ...

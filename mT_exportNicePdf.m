@@ -12,6 +12,10 @@ function mT_exportNicePdf(height, width, directory, saveName, varargin)
 % saveName: String. Filename to use
 % varargin: Boolean. Overide default behaviour regarding whether to plot with a
 % border
+
+% HISTORY
+% Reviewed 2020
+
 if isempty(varargin)
     borderRequest = [];
 else

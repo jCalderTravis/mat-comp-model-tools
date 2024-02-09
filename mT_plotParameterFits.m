@@ -15,6 +15,9 @@ function mT_plotParameterFits(DSet, modelNumber, plotType, sepPlots, smallFont)
 % more than one column sepPlots does nothing.
 % smallFont: (optional) Display in small font if true
 
+% HISTORY
+% Reviewed 2020
+
 if (nargin > 4) && smallFont
     fontSize = 4;
 else

@@ -98,6 +98,9 @@ function [figHandle, PtpntPlotData] = mT_plotVariableRelations(DSet, ...
 %   ambiguitiy (multiple series may use the same colour but different 
 %   plot types, but significant points are only indicated through colour).
 
+% HISTORY
+% Reviewed 2020
+% Significance testing added 2023
 
 if (~isempty(varargin)) && (~isempty(varargin{1}))
     figHandle = varargin{1};

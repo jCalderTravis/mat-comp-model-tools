@@ -14,6 +14,9 @@ function [numSuccess, restartsFigure, numSuccessFig] = mT_plotFitEndPoints(DSet,
 % varargin{2}: numModels long cell array of model names to use instead of 
 % simply numebering the models
 
+% HISTORY
+% Reviewed 2020
+
 if (~isempty(varargin)) && (~isempty(varargin{1}))
     toPlot = varargin{1};
     plotAll = false;

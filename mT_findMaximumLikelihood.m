@@ -24,6 +24,9 @@ function [Result, Logs] = mT_findMaximumLikelihood(PtpntData, DSetSpec, Settings
 % Logs         Structure detailing the various initial candedate parameter 
 %              values, and their associated negative log-liklihoods.
 
+% HISTORY
+% Reviewed 2020
+
 funTimer = tic;
 
 % Load variables that are saved seperately.

@@ -7,6 +7,9 @@ function ParamInfo = mT_duplicateParams(ParamInfo, down, across)
 % the dirstibutions used for the original parameter. Note, does this functions
 % does not change the field 'PackedOrder'.
 
+% HISTORY
+% Reviewed 2020
+
 % Check the old shape and set the new one
 assert(isequal(ParamInfo.UnpackedShape, [1, 1]))
 ParamInfo.UnpackedShape(1) = down;

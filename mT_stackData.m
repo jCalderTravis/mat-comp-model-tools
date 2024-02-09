@@ -18,6 +18,9 @@ function [stacked, stackDim] = mT_stackData(DataStruct, structPath)
 % TESTING
 % If pass DataStruct as the string 'test', runs tests instead.
 
+% HISTORY
+% Reviewed 2020
+
 if strcmp(DataStruct, 'test')
     testFun()
     return

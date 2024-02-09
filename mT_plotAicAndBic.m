@@ -20,6 +20,9 @@ function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
 %                       information criterion means, one for each model
 % figH                  Figure handle
 
+% HISTORY
+% Reviewed 2020
+
 if ~isempty(varargin)
     modelNames = varargin{1};
     xlabelTxt = 'Model';

@@ -6,6 +6,9 @@ function colour = mT_pickColour(colourNum)
 %   the 3-element vector specifying a colour. If sample, the code produces
 %   a figure showing the different colour options.
 
+% HISTORY
+% Reviewed 2020
+
 if ischar(colourNum) && strcmp(colourNum, 'sample')
     sampCols = nan(7, 1, 3); 
     for i=1:7

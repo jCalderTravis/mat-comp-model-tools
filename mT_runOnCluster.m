@@ -13,6 +13,9 @@ function mT_runOnCluster(jobDirectory, jobFile, resuming, timelimit, varargin)
 % Specified in the format used by slurm.
 % varargin: If set to 'debug', MATLAB does not quit on error
 
+% HISTORY
+% Reviewed 2020
+
 if ~isempty(varargin) && strcmp(varargin{1}, 'debug')
     inDebugMode = true;
     disp('System     Debug mode ON')

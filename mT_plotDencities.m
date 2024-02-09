@@ -59,6 +59,9 @@ function figHandle = mT_plotDencities(DSet, XVars, Rows, Series, ...
 %           has the same subplot structure, then all the data in the old
 %           subplots will be retianed.
 
+% HISTORY
+% Reviewed 2020
+
 if ~isempty(varargin)
     figHandle = varargin{1};
     hold on

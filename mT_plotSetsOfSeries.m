@@ -54,6 +54,10 @@ function figHandle = mT_plotSetsOfSeries(PlotData, PlotStyle, varargin)
 %           has the same subplot structure, then all the data in the old
 %           subplots will be retianed.
 
+% HISTORY
+% Reviewed 2020
+% Significance testing added 2023
+
 if ~isfield(PlotStyle, 'General') || strcmp(PlotStyle.General, 'computer')
     plotLineWidth = 4;
     axisLineWidth = 4;
@@ -298,7 +302,7 @@ if isfield(PlotStyle, 'Data') && isfield(PlotStyle.Data, 'Name')
     legendLabels = cell(1, numSeries);
     legendColours = cell(1, numSeries);
     
-    for iLabel = 1 : length(numSeries)
+    for iLabel = 1 : numSeries
         legendLabels{iLabel} = PlotStyle.Data(iLabel).Name;
         legendColours{iLabel} = PlotStyle.Data(iLabel).Colour;
     end

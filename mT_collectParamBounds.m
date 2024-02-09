@@ -3,6 +3,9 @@ function AllParamBounds = mT_collectParamBounds(DSet)
 % parameters that share upper, lower, and plausible upper and lower bounds, then
 % produces a structure describing these.
 
+% HISTORY
+% Reviewed 2020
+
 AllParamBounds = struct('LowerBound', [], 'PLB', [], 'PUB', [], 'UpperBound', []);
 
 for iP = 1 : length(DSet.P)

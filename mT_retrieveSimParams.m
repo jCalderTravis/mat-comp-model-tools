@@ -8,6 +8,9 @@ function SimParams = mT_retrieveSimParams(DSet, ptpnt)
 % the parameters from all participants are stacked along the first unused 
 % dimention of the array in each field of DSet.P(i).Sim.Params
 
+% HISTORY
+% Reviewed 2020
+
 % Check same parameters applied to all participants
 params = fieldnames(DSet.P(1).Sim.Params);
 
