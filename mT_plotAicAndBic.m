@@ -13,7 +13,16 @@ function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
 %                       also plots the participant by participant values as line
 %                       plots.
 % varargin{1}           numModels long cell array of model names to use 
-%                       instead of simply numebering the models
+%                       instead of simply numebering the models. If
+%                       supplied, only the bottom row of subplots will have
+%                       x-tick labels.
+% varargin{2}           scalar. If provided the y-limits on the plots of
+%                       information criteria means will be extended
+%                       by this quantity at the lower y-limit. Default 0.
+% varargin{3}           bool. If True (default) letter the subplots.
+% varargin{4}           bool. If True (default) also plot the number of 
+%                       participants best fit by each model, not just the 
+%                       information criteria averages.
 
 % OUTPUT
 % CritMeans             Stucture with field for AIC and BIC containing vector of
@@ -29,6 +38,24 @@ if ~isempty(varargin)
 else
     modelNames = [];
     xlabelTxt = 'Model number';
+end
+
+if (length(varargin) >= 2) && (~isempty(varargin{2}))
+    expandY = varargin{2};
+else
+    expandY = 0;
+end
+
+if (length(varargin) >= 3) && (~isempty(varargin{3}))
+    lettering = varargin{3};
+else
+    lettering = true;
+end
+
+if (length(varargin) >= 4) && (~isempty(varargin{4}))
+    plotNumPtpnts = varargin{4};
+else
+    plotNumPtpnts = true;
 end
 
 assert(~isempty(individualVals))
@@ -68,20 +95,33 @@ if ~isempty(predDencity)
     critCounter = critCounter +1;
 end
 
-pltCount = 1;
+if lettering
+    pltCount = 1;
+end
+
+if plotNumPtpnts
+    width = 2;
+else
+    width = 1;
+end
+tiledlayout(critCounter-1, width, TileSpacing="compact")
+
 for iCrit = 1 : length(infoCrit)
     
     [CritResultsTable, baselinedCrit] = mT_analyseInfoCriterion(infoCrit{iCrit});
     CritMeans.(critNames{iCrit}) = CritResultsTable.meanInfoCrit;
     
     % Plot type A: aggregate scores
-    subPlotObj = subplot(critCounter-1, 2, 1 + ((iCrit -1) *2) );
+    subPlotObj = nexttile(1 + ((iCrit -1) * width));
     subPlotObj.LineWidth = axisLineWidth;
     subPlotObj.FontSize = fontSize;
     
     xticks(CritResultsTable.modelNums)
-    ylabel({['Mean ' nameForPlot{iCrit}], '(difference from best model)'})
-    xlabel(xlabelTxt)
+    ylabel({['Mean ' nameForPlot{iCrit}], '(difference from', ...
+        'best model)'})
+    if iCrit == length(infoCrit)
+        xlabel(xlabelTxt)
+    end
     
     hold on
     
@@ -118,59 +158,59 @@ for iCrit = 1 : length(infoCrit)
     box off
     
     xlim([0.1, length(CritResultsTable{:, 1}) + 0.9])
-    
-    % Replace model numbers with names
-    if ~isempty(modelNames)
-        if length(xticklabels()) ~= length(modelNames)
-            error('Number of labels does not match the number of ticks')
-        end
-        xticklabels(modelNames)
-        xtickangle(90)
+    if expandY ~= 0
+        oldYLims = ylim();
+        ylim([oldYLims(1)-expandY, oldYLims(2)])
     end
     
-    pltCount = addLetterForSubplot(pltCount, fontSize);
+    replaceNumbersWithNames(modelNames, iCrit == length(infoCrit))
+    
+    if lettering
+        pltCount = addLetterForSubplot(pltCount, fontSize);
+    end
     
     % Plot type B: num participants best described
-    subPlotObj = subplot(critCounter-1, 2, 2 + ((iCrit -1) *2) );
-    subPlotObj.LineWidth = axisLineWidth;
-    subPlotObj.FontSize = fontSize;
-    subPlotObj.XAxisLocation = 'origin';
-    
-    if length(infoCrit) > 1
-        ylabel({'Number best fitting participants', ['(' nameForPlot{iCrit} ')']})
-    else
-        ylabel('Number best fitting participants')
-    end
-    
-    xlabel(xlabelTxt)
-    xticks(CritResultsTable.modelNums)
-    
-    hold on
-    
-    barObj = bar(CritResultsTable.modelNums, CritResultsTable.numBestFit);
-    
-    barObj.FaceColor = 'none';
-    barObj.EdgeColor = [0, 0, 0];
-    barObj.LineWidth = plotLineWidth;
-    
-    % Add line at y=0
-    refL = refline(0, 0);
-    refL.Color = [0, 0, 0];
-    refL.LineWidth = axisLineWidth;
-    
-    set(gca, 'TickDir', tickDirection);
-    xlim([0.1, length(CritResultsTable{:, 1}) + 0.9])
-    
-    % Replace model numbers with names
-    if ~isempty(modelNames)
-        if length(xticklabels()) ~= length(modelNames)
-            error('Number of labels does not match the numebr of ticks')
+    if plotNumPtpnts
+        subPlotObj = nexttile(2 + ((iCrit -1) *width));
+        subPlotObj.LineWidth = axisLineWidth;
+        subPlotObj.FontSize = fontSize;
+        subPlotObj.XAxisLocation = 'origin';
+
+        if length(infoCrit) > 1
+            ylabel({'Number best fitting', ...
+                ['participants (' nameForPlot{iCrit} ')']})
+        else
+            ylabel('Number best fitting participants')
         end
-        xticklabels(modelNames)
-        xtickangle(90)
+
+        if iCrit == length(infoCrit)
+            xlabel(xlabelTxt)
+        end
+        xticks(CritResultsTable.modelNums)
+
+        hold on
+
+        barObj = bar(CritResultsTable.modelNums, ...
+            CritResultsTable.numBestFit);
+
+        barObj.FaceColor = 'none';
+        barObj.EdgeColor = [0, 0, 0];
+        barObj.LineWidth = plotLineWidth;
+
+        % Add line at y=0
+        refL = refline(0, 0);
+        refL.Color = [0, 0, 0];
+        refL.LineWidth = axisLineWidth;
+
+        set(gca, 'TickDir', tickDirection);
+        xlim([0.1, length(CritResultsTable{:, 1}) + 0.9])
+
+        replaceNumbersWithNames(modelNames, iCrit == length(infoCrit))
+
+        if lettering
+            pltCount = addLetterForSubplot(pltCount, fontSize);
+        end
     end
-    
-    pltCount = addLetterForSubplot(pltCount, fontSize);
 end
 
 end
@@ -183,6 +223,30 @@ plotLable = text(-0.08, 1.04, ...
     'VerticalAlignment', 'Bottom');
 plotLable.FontSize = fontSize;
 pltCount = pltCount +1;
+
+end
+
+function replaceNumbersWithNames(modelNames, isLowest)
+% Replace model numbers with model names
+
+% INPUT
+% isLowest: bool. If true, means that we are working with the lowst row
+%   of subplots. When false, and modelNames is not empty, all labeling is 
+%   suppressed.
+
+if ~isempty(modelNames)
+    if length(xticklabels()) ~= length(modelNames)
+        error('Number of labels does not match the numebr of ' +...
+            'ticks')
+    end
+
+    if isLowest
+        xticklabels(modelNames)
+        xtickangle(90)
+    else
+        xticklabels([])
+    end
+end
 
 end
 
