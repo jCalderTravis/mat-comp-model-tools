@@ -34,7 +34,7 @@ function [CritMeans, figH] = mT_plotAicAndBic(aicData, bicData, predDencity, ...
 
 if ~isempty(varargin)
     modelNames = varargin{1};
-    xlabelTxt = 'Model';
+    xlabelTxt = [];
 else
     modelNames = [];
     xlabelTxt = 'Model number';
@@ -117,9 +117,8 @@ for iCrit = 1 : length(infoCrit)
     subPlotObj.FontSize = fontSize;
     
     xticks(CritResultsTable.modelNums)
-    ylabel({['Mean ' nameForPlot{iCrit}], '(difference from', ...
-        'best model)'})
-    if iCrit == length(infoCrit)
+    ylabel({['Mean ' nameForPlot{iCrit}], '(relative)'})
+    if (iCrit == length(infoCrit)) && (~isempty(xlabelTxt))
         xlabel(xlabelTxt)
     end
     
@@ -177,13 +176,13 @@ for iCrit = 1 : length(infoCrit)
         subPlotObj.XAxisLocation = 'origin';
 
         if length(infoCrit) > 1
-            ylabel({'Number best fitting', ...
+            ylabel({'Num. best fit', ...
                 ['participants (' nameForPlot{iCrit} ')']})
         else
             ylabel('Number best fitting participants')
         end
 
-        if iCrit == length(infoCrit)
+        if (iCrit == length(infoCrit)) && (~isempty(xlabelTxt))
             xlabel(xlabelTxt)
         end
         xticks(CritResultsTable.modelNums)

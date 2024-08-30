@@ -32,6 +32,8 @@ thisFig.InvertHardcopy = 'off';
 thisFig.Color = [1, 1, 1];
 
 set(findall(gcf, '-property', 'Font'),' Font', 'Arial')
+fontsize(10, 'points')
+set(gca, 'DefaultLineLineWidth', 0.5) % akstelle -- has this worked?
 
 % Do we need a border to ensure all text not chopped off the page?
 interpreter = get(groot,'defaultAxesTickLabelInterpreter');
