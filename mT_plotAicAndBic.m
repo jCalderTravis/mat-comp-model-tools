@@ -63,9 +63,9 @@ if any(predDencity(:)<0); error('Pass the **negative** cross validated LL.'); en
 
 figH = figure('Name', figureTitle, 'NumberTitle', 'off');
 
-plotLineWidth = 1;
-axisLineWidth = 1;
-inidividualLineWidth = 1;
+plotLineWidth = get(groot, 'DefaultLineLineWidth');
+axisLineWidth = get(groot, 'DefaultLineLineWidth');
+inidividualLineWidth = get(groot, 'DefaultLineLineWidth');
 fontSize = 10;
 tickDirection = 'out';
 

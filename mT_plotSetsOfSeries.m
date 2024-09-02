@@ -65,9 +65,9 @@ if ~isfield(PlotStyle, 'General') || strcmp(PlotStyle.General, 'computer')
     fontSize = 30;
     tickDirection = 'out';
 elseif strcmp(PlotStyle.General, 'paper')
-    plotLineWidth = 1;
-    axisLineWidth = 1;
-    refLineWidth = 1;
+    plotLineWidth = get(groot, 'DefaultLineLineWidth');
+    axisLineWidth = get(groot, 'DefaultLineLineWidth');
+    refLineWidth = get(groot, 'DefaultLineLineWidth');
     fontSize = 10;
     tickDirection = 'out';
 end
