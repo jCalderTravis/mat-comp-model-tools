@@ -9,5 +9,5 @@ function envInfo = mT_findEnvInfo()
 %   CondaEnv: str. The name of the conda environment to activate when using
 %       python based functions.
 
-envInfo.CondaActivate = 'C:\Users\Joshua\miniconda3\Scripts\activate';
+envInfo.CondaActivate = 'C:\Users\Calder\miniconda3\Scripts\activate';
 envInfo.CondaEnv = 'mne-standard';
